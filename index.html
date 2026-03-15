@@ -625,7 +625,19 @@ const DEFAULT_SOURCES = [
   { id: 's3', name: 'The Guardian', url: 'https://www.theguardian.com/world/rss',                 enabled: true  },
   { id: 's4', name: 'TechCrunch',   url: 'https://techcrunch.com/feed/',                          enabled: true  },
   { id: 's5', name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index',       enabled: true  },
-  { id: 's6', name: 'NASA',         url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss',        enabled: false },
+  { id: 's6',  name: 'NASA',              url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss',                          enabled: false },
+  { id: 's7',  name: 'Reuters',           url: 'https://feeds.reuters.com/reuters/topNews',                                enabled: false },
+  { id: 's8',  name: 'Al Jazeera',        url: 'https://www.aljazeera.com/xml/rss/all.xml',                               enabled: false },
+  { id: 's9',  name: 'Deutsche Welle',    url: 'https://rss.dw.com/rdf/rss-en-all',                                       enabled: false },
+  { id: 's10', name: 'France 24',         url: 'https://www.france24.com/en/rss',                                         enabled: false },
+  { id: 's11', name: 'NPR News',          url: 'https://feeds.npr.org/1001/rss.xml',                                      enabled: false },
+  { id: 's12', name: 'The Independent',   url: 'https://www.independent.co.uk/news/rss',                                  enabled: false },
+  { id: 's13', name: 'Sky News',          url: 'https://feeds.skynews.com/feeds/rss/world.xml',                           enabled: false },
+  { id: 's14', name: 'Sydney Morning Herald', url: 'https://www.smh.com.au/rss/feed.xml',                                 enabled: false },
+  { id: 's15', name: 'Times of India',    url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',               enabled: false },
+  { id: 's16', name: 'South China Morning Post', url: 'https://www.scmp.com/rss/91/feed',                                 enabled: false },
+  { id: 's17', name: 'The Hindu',         url: 'https://www.thehindu.com/feeder/default.rss',                             enabled: false },
+  { id: 's18', name: 'Irish Times',       url: 'https://www.irishtimes.com/cmlink/news-1.1319492',                        enabled: false },
 ];
 
 const state = {
@@ -921,9 +933,8 @@ function renderCard(article) {
   const imgHtml = article.image
     ? `<img class="card-img" src="${escapeAttr(article.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
     : '';
-  const accentStyle = compact ? `border-top: 3px solid ${color}` : '';
 
-  return `<a class="card${compact ? ' card--compact' : ''}" href="${escapeAttr(article.link)}" target="_blank" rel="noopener noreferrer" style="${accentStyle}">
+  return `<a class="card${compact ? ' card--compact' : ''}" href="${escapeAttr(article.link)}" target="_blank" rel="noopener noreferrer" style="border-top: 3px solid ${color}">
     ${imgHtml}
     <div class="card-body">
       <div class="card-meta">
