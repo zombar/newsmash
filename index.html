@@ -785,11 +785,11 @@
           <div id="interval-row">
             <label for="interval-select">Refresh every</label>
             <select class="input" id="interval-select" style="width: auto">
-              <option value="1">1 min</option>
-              <option value="5" selected>5 min</option>
-              <option value="10">10 min</option>
-              <option value="30">30 min</option>
-              <option value="60">60 min</option>
+              <option value="60" selected>1 hour</option>
+              <option value="120">2 hours</option>
+              <option value="240">4 hours</option>
+              <option value="480">8 hours</option>
+              <option value="1440">24 hours</option>
             </select>
           </div>
           <div id="retention-row" style="margin-top: 10px">
@@ -826,7 +826,6 @@
       const STORAGE_KEY = "newsmash_v1";
       const ARTICLES_KEY = "newsmash_articles_v1";
       const CORS_PROXIES = [
-        (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
         (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
         (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
       ];
@@ -926,7 +925,7 @@
         sources: [],
         articles: [],
         searchQuery: "",
-        refreshInterval: 5,
+        refreshInterval: 60,
         articleMaxAgeDays: 7,
         openInNewTab: false,
         autoScrollEnabled: true,
@@ -945,7 +944,7 @@
             const savedIds = new Set(saved.map((s) => s.id));
             const newDefaults = DEFAULT_SOURCES.filter((s) => !savedIds.has(s.id));
             state.sources = [...saved, ...newDefaults];
-            state.refreshInterval = data.refreshInterval || 5;
+            state.refreshInterval = Math.max(60, data.refreshInterval || 60);
             state.articleMaxAgeDays = data.articleMaxAgeDays || 7;
             state.openInNewTab = data.openInNewTab === true;
             state.autoScrollEnabled = data.autoScrollEnabled !== false;
@@ -1490,7 +1489,10 @@
           state.refreshInterval = parseInt(e.target.value, 10);
           saveSettings();
           scheduleRefresh();
-          showToast(`Auto-refresh set to ${state.refreshInterval} min`, "success");
+          showToast(
+            `Auto-refresh set to ${state.refreshInterval >= 60 ? state.refreshInterval / 60 + "h" : state.refreshInterval + "m"}`,
+            "success",
+          );
         });
         document.getElementById("resume-select").addEventListener("change", (e) => {
           state.autoScrollResumeDelay = parseInt(e.target.value, 10);
