@@ -602,7 +602,11 @@ select.input {
 <script>
 const STORAGE_KEY   = 'newsmash_v1';
 const ARTICLES_KEY  = 'newsmash_articles_v1';
-const CORS_PROXY    = 'https://api.allorigins.win/raw?url=';
+const CORS_PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+];
 
 const SOURCE_COLORS = [
   '#0969da','#1a7f37','#9a6700','#cf222e','#8250df',
@@ -670,10 +674,17 @@ function sourceColor(sourceId) {
 
 // ── RSS Parsing ──
 async function fetchFeed(source) {
-  const url = CORS_PROXY + encodeURIComponent(source.url);
-  const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return parseRSS(await res.text(), source);
+  let lastErr;
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const res = await fetch(proxy(source.url), { signal: AbortSignal.timeout(15000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return parseRSS(await res.text(), source);
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr;
 }
 
 function extractImages(item) {
