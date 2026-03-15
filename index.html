@@ -42,6 +42,11 @@
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="e975534c-2a41-48e5-aea5-8a825841b4d2"
+    ></script>
     <style>
       *,
       *::before,
@@ -348,6 +353,21 @@
       }
       .btn-secondary:hover {
         border-color: var(--ink);
+      }
+
+      .settings-privacy-note {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--text-muted);
+        padding: 10px 12px;
+        margin: 0;
+        line-height: 1.5;
+      }
+      .settings-privacy-note a {
+        color: inherit;
+        text-decoration: underline;
       }
 
       /* ── Settings Drawer ── */
@@ -724,6 +744,11 @@
         </button>
       </div>
       <div id="settings-body">
+        <p class="settings-privacy-note">
+          Your data stays on your device — nothing is sent to any server. Usage is tracked anonymously via
+          <a href="https://umami.is" target="_blank" rel="noopener">Umami</a>
+          .
+        </p>
         <div class="settings-section">
           <h3>Articles</h3>
           <div class="setting-row">
