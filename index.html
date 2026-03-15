@@ -613,6 +613,38 @@ const SOURCE_COLORS = [
   '#0550ae','#116329','#633c01','#a40e26','#6e40c9'
 ];
 
+// Maps lowercase RSS <category> terms to our category IDs
+const FEED_CATEGORY_MAP = {
+  // tech
+  'technology':'tech','tech':'tech','computing':'tech','software':'tech','hardware':'tech',
+  'internet':'tech','gadgets':'tech','mobile':'tech','ai':'tech','artificial intelligence':'tech',
+  'cybersecurity':'tech','security':'tech','data':'tech','cloud':'tech','apps':'tech',
+  // science
+  'science':'science','health':'science','environment':'science','nature':'science',
+  'space':'science','medicine':'science','climate':'science','physics':'science',
+  'biology':'science','astronomy':'science','energy':'science','weather':'science',
+  // sport
+  'sport':'sport','sports':'sport','football':'sport','soccer':'sport','tennis':'sport',
+  'cricket':'sport','rugby':'sport','basketball':'sport','baseball':'sport',
+  'athletics':'sport','cycling':'sport','golf':'sport','motorsport':'sport',
+  // business
+  'business':'business','economy':'business','finance':'business','economics':'business',
+  'markets':'business','money':'business','investing':'business','companies':'business',
+  'startup':'business','fintech':'business','crypto':'business','cryptocurrency':'business',
+  // world / politics
+  'world':'world','politics':'world','international':'world','global':'world',
+  'uk politics':'world','us politics':'world','europe':'world','asia':'world',
+  'middle east':'world','africa':'world','war':'world','conflict':'world',
+  'government':'world','policy':'world','elections':'world','law':'world',
+  // entertainment
+  'entertainment':'entertainment','arts':'entertainment','culture':'entertainment',
+  'film':'entertainment','movies':'entertainment','music':'entertainment',
+  'tv':'entertainment','television':'entertainment','gaming':'entertainment',
+  'games':'entertainment','books':'entertainment','theatre':'entertainment',
+  'celebrity':'entertainment','fashion':'entertainment','food':'entertainment',
+  'travel':'entertainment',
+};
+
 const CATEGORIES = [
   { id: 'tech',          label: 'Tech',          keywords: ['artificial intelligence','machine learning','cybersecurity','semiconductor','open source','programming','developer','startup','quantum computing','robotics','autonomous','smartphone','nvidia','microsoft','openai','github','data breach','silicon valley','big tech','algorithm','blockchain','iphone','android','software engineer','tech company'] },
   { id: 'science',       label: 'Science',        keywords: ['climate change','space mission','nasa','biology','physics','chemistry','genome','vaccine','clinical trial','fossil','evolution','planet','asteroid','telescope','neuroscience','scientific','ecology','biodiversity','renewable energy','gene','particle','species extinction'] },
@@ -623,24 +655,25 @@ const CATEGORIES = [
 ];
 
 const DEFAULT_SOURCES = [
-  { id: 's1', name: 'Hacker News',  url: 'https://hnrss.org/frontpage',                          enabled: true  },
-  { id: 's2', name: 'BBC News',     url: 'http://feeds.bbci.co.uk/news/rss.xml',                  enabled: true  },
-  { id: 's3', name: 'The Guardian', url: 'https://www.theguardian.com/world/rss',                 enabled: true  },
-  { id: 's4', name: 'TechCrunch',   url: 'https://techcrunch.com/feed/',                          enabled: true  },
-  { id: 's5', name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index',       enabled: true  },
-  { id: 's6',  name: 'NASA',              url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss',                          enabled: false },
-  { id: 's7',  name: 'Reuters',           url: 'https://feeds.reuters.com/reuters/topNews',                                enabled: false },
-  { id: 's8',  name: 'Al Jazeera',        url: 'https://www.aljazeera.com/xml/rss/all.xml',                               enabled: false },
-  { id: 's9',  name: 'Deutsche Welle',    url: 'https://rss.dw.com/rdf/rss-en-all',                                       enabled: false },
-  { id: 's10', name: 'France 24',         url: 'https://www.france24.com/en/rss',                                         enabled: false },
-  { id: 's11', name: 'NPR News',          url: 'https://feeds.npr.org/1001/rss.xml',                                      enabled: false },
-  { id: 's12', name: 'The Independent',   url: 'https://www.independent.co.uk/news/rss',                                  enabled: false },
-  { id: 's13', name: 'Sky News',          url: 'https://feeds.skynews.com/feeds/rss/world.xml',                           enabled: false },
-  { id: 's14', name: 'Sydney Morning Herald', url: 'https://www.smh.com.au/rss/feed.xml',                                 enabled: false },
-  { id: 's15', name: 'Times of India',    url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',               enabled: false },
+  { id: 's1',  name: 'Hacker News',            url: 'https://hnrss.org/frontpage',                                        enabled: true,  tags: ['tech'] },
+  { id: 's2',  name: 'BBC News',               url: 'http://feeds.bbci.co.uk/news/rss.xml',                               enabled: true  },
+  { id: 's3',  name: 'The Guardian',           url: 'https://www.theguardian.com/world/rss',                              enabled: true  },
+  { id: 's4',  name: 'TechCrunch',             url: 'https://techcrunch.com/feed/',                                       enabled: true,  tags: ['tech'] },
+  { id: 's5',  name: 'Ars Technica',           url: 'https://feeds.arstechnica.com/arstechnica/index',                    enabled: true,  tags: ['tech', 'science'] },
+  { id: 's6',  name: 'NASA',                   url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss',                     enabled: false, tags: ['science'] },
+  { id: 's7',  name: 'Reuters',                url: 'https://feeds.reuters.com/reuters/topNews',                          enabled: false },
+  { id: 's8',  name: 'Al Jazeera',             url: 'https://www.aljazeera.com/xml/rss/all.xml',                          enabled: false },
+  { id: 's9',  name: 'Deutsche Welle',         url: 'https://rss.dw.com/rdf/rss-en-all',                                  enabled: false },
+  { id: 's10', name: 'France 24',              url: 'https://www.france24.com/en/rss',                                    enabled: false },
+  { id: 's11', name: 'NPR News',               url: 'https://feeds.npr.org/1001/rss.xml',                                 enabled: false },
+  { id: 's12', name: 'The Independent',        url: 'https://www.independent.co.uk/news/rss',                             enabled: false },
+  { id: 's13', name: 'Sky News',               url: 'https://feeds.skynews.com/feeds/rss/world.xml',                      enabled: false },
+  { id: 's14', name: 'Sydney Morning Herald',  url: 'https://www.smh.com.au/rss/feed.xml',                                enabled: false },
+  { id: 's15', name: 'Times of India',         url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',         enabled: false },
   { id: 's16', name: 'South China Morning Post', url: 'https://www.scmp.com/rss/91/feed',                                 enabled: false },
-  { id: 's17', name: 'The Hindu',         url: 'https://www.thehindu.com/feeder/default.rss',                             enabled: false },
-  { id: 's18', name: 'Irish Times',       url: 'https://www.irishtimes.com/cmlink/news-1.1319492',                        enabled: false },
+  { id: 's17', name: 'The Hindu',              url: 'https://www.thehindu.com/feeder/default.rss',                        enabled: false },
+  { id: 's18', name: 'Irish Times',            url: 'https://www.irishtimes.com/cmlink/news-1.1319492',                   enabled: false },
+  { id: 's19', name: 'The Register',           url: 'https://www.theregister.com/headlines.atom',                        enabled: false, tags: ['tech'] },
 ];
 
 const state = {
@@ -801,10 +834,18 @@ function parseRSS(xmlText, source) {
       description = getTextContent(item, 'description', 'content:encoded', 'content');
     }
     const date = pubDate ? new Date(pubDate) : new Date(0);
+    // Extract RSS/Atom <category> tags and map to our category IDs
+    const feedCategories = Array.from(item.querySelectorAll('category'))
+      .map(el => (el.getAttribute('term') || el.getAttribute('label') || el.textContent || '').trim().toLowerCase())
+      .filter(Boolean)
+      .map(c => FEED_CATEGORY_MAP[c])
+      .filter(Boolean);
     return {
       id: link || title,
       sourceId: source.id,
       sourceName: source.name,
+      sourceTags: source.tags || [],
+      feedCategories,
       title: stripHtml(title),
       link,
       date: isNaN(date.getTime()) ? new Date(0) : date,
@@ -893,12 +934,16 @@ function interleaveArticles(articles) {
 
 function articleMatchesCategories(article, catIds) {
   if (!catIds.length) return false;
+  // Tier 1: RSS feed <category> tags mapped to our IDs — most accurate
+  if (article.feedCategories && article.feedCategories.some(c => catIds.includes(c))) return true;
+  // Tier 2: source-level tags (e.g. TechCrunch → tech)
+  if (article.sourceTags && article.sourceTags.some(t => catIds.includes(t))) return true;
+  // Tier 3: keyword matching as fallback for untagged sources
   const haystack = (article.title + ' ' + article.description).toLowerCase();
   return catIds.some(cid => {
     const cat = CATEGORIES.find(c => c.id === cid);
     return cat && cat.keywords.some(kw => {
       const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      // phrases: substring match; single words: require word boundary
       const re = /\s/.test(kw)
         ? new RegExp(escaped, 'i')
         : new RegExp('\\b' + escaped + '\\b', 'i');
