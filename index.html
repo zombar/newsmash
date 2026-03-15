@@ -73,31 +73,6 @@ body {
   text-transform: uppercase;
 }
 
-#filter-bar {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  flex: 1;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 4px 0;
-}
-#filter-bar::-webkit-scrollbar { display: none; }
-
-.chip {
-  flex-shrink: 0;
-  padding: 4px 12px;
-  border-radius: 0;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.chip:hover { border-color: var(--accent); color: var(--text); }
-.chip.active { background: var(--ink); border-color: var(--ink); color: var(--ink-inv); font-weight: 600; }
 
 #header-right {
   display: flex;
@@ -347,23 +322,7 @@ body {
   margin-bottom: 10px;
 }
 
-#category-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
 
-.cat-chip {
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.15s;
-}
-.cat-chip:hover { border-color: var(--ink); color: var(--text); }
-.cat-chip.active { background: var(--ink); border-color: var(--ink); color: var(--ink-inv); font-weight: 600; }
 
 .source-item {
   display: flex;
@@ -536,7 +495,6 @@ select.input {
 
 <header id="header">
   <div id="logo">NEWSMASH.IO</div>
-  <div id="filter-bar"></div>
   <div id="header-right">
     <button class="icon-btn" id="theme-btn" title="Toggle theme">
       <svg id="theme-icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -572,6 +530,13 @@ select.input {
     </button>
   </div>
   <div id="settings-body">
+    <div class="settings-section">
+      <h3>Articles</h3>
+      <div class="setting-row">
+        <label>Open in new tab</label>
+        <button class="toggle" id="newtab-toggle" onclick="toggleNewTab()"></button>
+      </div>
+    </div>
     <div class="settings-section">
       <h3>Auto-scroll</h3>
       <div class="setting-row">
@@ -613,11 +578,6 @@ select.input {
       </div>
     </div>
     <div class="settings-section">
-      <h3>Prioritise Categories</h3>
-      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Selected categories appear at the top of your feed.</p>
-      <div id="category-chips"></div>
-    </div>
-    <div class="settings-section">
       <h3>Sources</h3>
       <div id="source-list"></div>
     </div>
@@ -646,46 +606,6 @@ const CORS_PROXIES = [
 ];
 
 
-// Maps lowercase RSS <category> terms to our category IDs
-const FEED_CATEGORY_MAP = {
-  // tech
-  'technology':'tech','tech':'tech','computing':'tech','software':'tech','hardware':'tech',
-  'internet':'tech','gadgets':'tech','mobile':'tech','ai':'tech','artificial intelligence':'tech',
-  'cybersecurity':'tech','security':'tech','data':'tech','cloud':'tech','apps':'tech',
-  // science
-  'science':'science','health':'science','environment':'science','nature':'science',
-  'space':'science','medicine':'science','climate':'science','physics':'science',
-  'biology':'science','astronomy':'science','energy':'science','weather':'science',
-  // sport
-  'sport':'sport','sports':'sport','football':'sport','soccer':'sport','tennis':'sport',
-  'cricket':'sport','rugby':'sport','basketball':'sport','baseball':'sport',
-  'athletics':'sport','cycling':'sport','golf':'sport','motorsport':'sport',
-  // business
-  'business':'business','economy':'business','finance':'business','economics':'business',
-  'markets':'business','money':'business','investing':'business','companies':'business',
-  'startup':'business','fintech':'business','crypto':'business','cryptocurrency':'business',
-  // world / politics
-  'world':'world','politics':'world','international':'world','global':'world',
-  'uk politics':'world','us politics':'world','europe':'world','asia':'world',
-  'middle east':'world','africa':'world','war':'world','conflict':'world',
-  'government':'world','policy':'world','elections':'world','law':'world',
-  // entertainment
-  'entertainment':'entertainment','arts':'entertainment','culture':'entertainment',
-  'film':'entertainment','movies':'entertainment','music':'entertainment',
-  'tv':'entertainment','television':'entertainment','gaming':'entertainment',
-  'games':'entertainment','books':'entertainment','theatre':'entertainment',
-  'celebrity':'entertainment','fashion':'entertainment','food':'entertainment',
-  'travel':'entertainment',
-};
-
-const CATEGORIES = [
-  { id: 'tech',          label: 'Tech',          keywords: ['artificial intelligence','machine learning','cybersecurity','semiconductor','open source','programming','developer','startup','quantum computing','robotics','autonomous','smartphone','nvidia','microsoft','openai','github','data breach','silicon valley','big tech','algorithm','blockchain','iphone','android','software engineer','tech company'] },
-  { id: 'science',       label: 'Science',        keywords: ['climate change','space mission','nasa','biology','physics','chemistry','genome','vaccine','clinical trial','fossil','evolution','planet','asteroid','telescope','neuroscience','scientific','ecology','biodiversity','renewable energy','gene','particle','species extinction'] },
-  { id: 'sport',         label: 'Sport',          keywords: ['football','soccer','basketball','tennis','cricket','rugby','baseball','olympics','athlete','tournament','championship','transfer','grand prix','formula 1','cycling','swimming','premier league','world cup','playoff','quarterback','goalkeeper','esports','match result','sporting'] },
-  { id: 'business',      label: 'Business',       keywords: ['stock market','interest rate','hedge fund','venture capital','inflation','recession','gdp','merger','acquisition','ipo','cryptocurrency','central bank','federal reserve','wall street','earnings','dividend','trade war','supply chain','fiscal','monetary policy','private equity'] },
-  { id: 'world',         label: 'World',          keywords: ['election','geopolitical','military','nato','united nations','sanctions','diplomat','refugee','ceasefire','president','prime minister','parliament','coup','revolution','foreign policy','treaty','warfare','armed forces','insurgent','humanitarian'] },
-  { id: 'entertainment', label: 'Entertainment',  keywords: ['box office','oscar','grammy','emmy','bafta','celebrity','blockbuster','netflix','disney','concert','album release','video game','gaming','film festival','movie review','sitcom','pop star','chart-topping','streaming service','award ceremony'] },
-];
 
 const DEFAULT_SOURCES = [
   { id: 's1',  name: 'Hacker News',            url: 'https://hnrss.org/frontpage',                                        enabled: true,  tags: ['tech'] },
@@ -712,11 +632,10 @@ const DEFAULT_SOURCES = [
 const state = {
   sources: [],
   articles: [],
-  activeFilter: 'all',
   searchQuery: '',
-  priorityCategories: [],
   refreshInterval: 5,
   articleMaxAgeDays: 7,
+  openInNewTab: false,
   autoScrollEnabled: true,
   autoScrollResumeDelay: 10,
   refreshTimer: null,
@@ -735,7 +654,7 @@ function loadSettings() {
       state.sources = [...saved, ...newDefaults];
       state.refreshInterval = data.refreshInterval || 5;
       state.articleMaxAgeDays = data.articleMaxAgeDays || 7;
-      state.priorityCategories = data.priorityCategories || [];
+      state.openInNewTab = data.openInNewTab === true;
       state.autoScrollEnabled = data.autoScrollEnabled !== false;
       state.autoScrollResumeDelay = data.autoScrollResumeDelay ?? 10;
     } else {
@@ -751,7 +670,7 @@ function saveSettings() {
     sources: state.sources,
     refreshInterval: state.refreshInterval,
     articleMaxAgeDays: state.articleMaxAgeDays,
-    priorityCategories: state.priorityCategories,
+    openInNewTab: state.openInNewTab,
     autoScrollEnabled: state.autoScrollEnabled,
     autoScrollResumeDelay: state.autoScrollResumeDelay,
   }));
@@ -863,18 +782,10 @@ function parseRSS(xmlText, source) {
       description = getTextContent(item, 'description', 'content:encoded', 'content');
     }
     const date = pubDate ? new Date(pubDate) : new Date(0);
-    // Extract RSS/Atom <category> tags and map to our category IDs
-    const feedCategories = Array.from(item.querySelectorAll('category'))
-      .map(el => (el.getAttribute('term') || el.getAttribute('label') || el.textContent || '').trim().toLowerCase())
-      .filter(Boolean)
-      .map(c => FEED_CATEGORY_MAP[c])
-      .filter(Boolean);
     return {
       id: link || title,
       sourceId: source.id,
       sourceName: source.name,
-      sourceTags: source.tags || [],
-      feedCategories,
       title: stripHtml(title),
       link,
       date: isNaN(date.getTime()) ? new Date(0) : date,
@@ -961,35 +872,8 @@ function interleaveArticles(articles) {
   return result;
 }
 
-function articleMatchesCategories(article, catIds) {
-  if (!catIds.length) return false;
-  // Tier 1: RSS feed <category> tags mapped to our IDs — most accurate
-  if (article.feedCategories && article.feedCategories.some(c => catIds.includes(c))) return true;
-  // Tier 2: source-level tags (e.g. TechCrunch → tech)
-  if (article.sourceTags && article.sourceTags.some(t => catIds.includes(t))) return true;
-  // Tier 3: keyword matching as fallback for untagged sources
-  const haystack = (article.title + ' ' + article.description).toLowerCase();
-  return catIds.some(cid => {
-    const cat = CATEGORIES.find(c => c.id === cid);
-    return cat && cat.keywords.some(kw => {
-      const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = /\s/.test(kw)
-        ? new RegExp(escaped, 'i')
-        : new RegExp('\\b' + escaped + '\\b', 'i');
-      return re.test(haystack);
-    });
-  });
-}
-
 function filteredArticles() {
-  let list;
-  if (state.activeFilter === 'all') {
-    list = state.articles;
-  } else if (CATEGORIES.find(c => c.id === state.activeFilter)) {
-    list = state.articles.filter(a => articleMatchesCategories(a, [state.activeFilter]));
-  } else {
-    list = state.articles.filter(a => a.sourceId === state.activeFilter);
-  }
+  let list = state.articles;
 
   if (state.searchQuery) {
     const q = state.searchQuery.toLowerCase();
@@ -1000,11 +884,7 @@ function filteredArticles() {
     );
   }
 
-  if (!state.priorityCategories.length) return interleaveArticles(list);
-
-  const priority = [], rest = [];
-  list.forEach(a => (articleMatchesCategories(a, state.priorityCategories) ? priority : rest).push(a));
-  return [...interleaveArticles(priority), ...interleaveArticles(rest)];
+  return interleaveArticles(list);
 }
 
 function renderGrid() {
@@ -1023,7 +903,8 @@ function renderCard(article) {
     ? `<img class="card-img" src="${escapeAttr(article.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
     : '';
 
-  return `<a class="card${compact ? ' card--compact' : ''}" href="${escapeAttr(article.link)}" target="_blank" rel="noopener noreferrer">
+  const target = state.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : '';
+  return `<a class="card${compact ? ' card--compact' : ''}" href="${escapeAttr(article.link)}"${target}>
     ${imgHtml}
     <div class="card-body">
       <div class="card-meta">
@@ -1051,22 +932,6 @@ function showSkeletons(count) {
   ).join('');
 }
 
-function renderCategoryFilters() {
-  document.getElementById('filter-bar').innerHTML = [
-    `<button class="chip ${state.activeFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">All</button>`,
-    ...CATEGORIES.map(c =>
-      `<button class="chip ${state.activeFilter === c.id ? 'active' : ''}" onclick="setFilter('${c.id}')">${c.label}</button>`
-    )
-  ].join('');
-}
-
-function setFilter(id) {
-  state.activeFilter = id;
-  renderCategoryFilters();
-  renderGrid();
-}
-
-
 // ── Settings ──
 function openSettings() {
   document.getElementById('settings-overlay').classList.add('open');
@@ -1075,11 +940,18 @@ function openSettings() {
   document.getElementById('interval-select').value = String(state.refreshInterval);
   document.getElementById('retention-select').value = String(state.articleMaxAgeDays);
   document.getElementById('resume-select').value = String(state.autoScrollResumeDelay);
+  document.getElementById('newtab-toggle').classList.toggle('on', state.openInNewTab);
   const toggle = document.getElementById('autoscroll-toggle');
   toggle.classList.toggle('on', state.autoScrollEnabled);
   document.getElementById('autoscroll-resume-row').style.opacity = state.autoScrollEnabled ? '1' : '0.4';
-  renderCategoryChips();
   renderSourceList();
+}
+
+function toggleNewTab() {
+  state.openInNewTab = !state.openInNewTab;
+  saveSettings();
+  document.getElementById('newtab-toggle').classList.toggle('on', state.openInNewTab);
+  renderGrid();
 }
 
 function toggleAutoScroll() {
@@ -1092,21 +964,6 @@ function toggleAutoScroll() {
   else { if (autoScrollRaf) { cancelAnimationFrame(autoScrollRaf); autoScrollRaf = null; } if (autoScrollResumeTimer) { clearTimeout(autoScrollResumeTimer); autoScrollResumeTimer = null; } }
 }
 
-function renderCategoryChips() {
-  document.getElementById('category-chips').innerHTML = CATEGORIES.map(c => {
-    const active = state.priorityCategories.includes(c.id);
-    return `<button class="cat-chip ${active ? 'active' : ''}" onclick="toggleCategory('${c.id}')">${c.label}</button>`;
-  }).join('');
-}
-
-function toggleCategory(id) {
-  const idx = state.priorityCategories.indexOf(id);
-  if (idx === -1) state.priorityCategories.push(id);
-  else state.priorityCategories.splice(idx, 1);
-  saveSettings();
-  renderCategoryChips();
-  renderGrid();
-}
 
 function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
@@ -1140,7 +997,7 @@ function toggleSource(id) {
   src.enabled = !src.enabled;
   saveSettings();
   renderSourceList();
-  renderCategoryFilters();
+
   renderGrid();
 }
 
@@ -1149,7 +1006,7 @@ function deleteSource(id) {
   state.articles = state.articles.filter(a => a.sourceId !== id);
   saveSettings();
   renderSourceList();
-  renderCategoryFilters();
+
   renderGrid();
   showToast('Source removed', 'success');
 }
@@ -1166,7 +1023,7 @@ function addSource() {
   state.sources.push({ id, name, url, enabled: true });
   saveSettings();
   renderSourceList();
-  renderCategoryFilters();
+
   nameEl.value = urlEl.value = '';
   showToast(`Added "${name}" — fetching…`, 'success');
 
@@ -1334,10 +1191,10 @@ function init() {
   const cached = loadCachedArticles();
   if (cached.length) {
     state.articles = cached.map(a => ({ ...a, date: new Date(a.date) }));
-    renderCategoryFilters();
+  
     renderGrid();
   } else {
-    renderCategoryFilters();
+  
     showSkeletons(12);
   }
 
