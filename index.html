@@ -21,7 +21,7 @@
   --ink-inv: #fff;
   --shimmer-a: #f0f2f4;
   --shimmer-b: #e8ebee;
-  --header-bg: rgba(255,255,255,0.93);
+  --header-bg: rgba(255,255,255,0.55);
 }
 
 html.dark {
@@ -35,7 +35,7 @@ html.dark {
   --ink-inv: #000;
   --shimmer-a: #161b22;
   --shimmer-b: #21262d;
-  --header-bg: rgba(13,17,23,0.92);
+  --header-bg: rgba(13,17,23,0.55);
 }
 
 body {
@@ -889,9 +889,14 @@ function articleMatchesCategories(article, catIds) {
 }
 
 function filteredArticles() {
-  const list = state.activeFilter === 'all'
-    ? state.articles
-    : state.articles.filter(a => a.sourceId === state.activeFilter);
+  let list;
+  if (state.activeFilter === 'all') {
+    list = state.articles;
+  } else if (CATEGORIES.find(c => c.id === state.activeFilter)) {
+    list = state.articles.filter(a => articleMatchesCategories(a, [state.activeFilter]));
+  } else {
+    list = state.articles.filter(a => a.sourceId === state.activeFilter);
+  }
 
   if (!state.priorityCategories.length) return interleaveArticles(list);
 
@@ -947,19 +952,18 @@ function showSkeletons(count) {
   ).join('');
 }
 
-function renderSourceFilters() {
-  const enabled = state.sources.filter(s => s.enabled);
+function renderCategoryFilters() {
   document.getElementById('filter-bar').innerHTML = [
     `<button class="chip ${state.activeFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">All</button>`,
-    ...enabled.map(s =>
-      `<button class="chip ${state.activeFilter === s.id ? 'active' : ''}" onclick="setFilter('${s.id}')">${escapeHtml(s.name)}</button>`
+    ...CATEGORIES.map(c =>
+      `<button class="chip ${state.activeFilter === c.id ? 'active' : ''}" onclick="setFilter('${c.id}')">${c.label}</button>`
     )
   ].join('');
 }
 
 function setFilter(id) {
   state.activeFilter = id;
-  renderSourceFilters();
+  renderCategoryFilters();
   renderGrid();
 }
 
@@ -1037,18 +1041,16 @@ function toggleSource(id) {
   src.enabled = !src.enabled;
   saveSettings();
   renderSourceList();
-  renderSourceFilters();
-  if (state.activeFilter === id && !src.enabled) state.activeFilter = 'all';
+  renderCategoryFilters();
   renderGrid();
 }
 
 function deleteSource(id) {
   state.sources = state.sources.filter(s => s.id !== id);
   state.articles = state.articles.filter(a => a.sourceId !== id);
-  if (state.activeFilter === id) state.activeFilter = 'all';
   saveSettings();
   renderSourceList();
-  renderSourceFilters();
+  renderCategoryFilters();
   renderGrid();
   showToast('Source removed', 'success');
 }
@@ -1065,7 +1067,7 @@ function addSource() {
   state.sources.push({ id, name, url, enabled: true });
   saveSettings();
   renderSourceList();
-  renderSourceFilters();
+  renderCategoryFilters();
   nameEl.value = urlEl.value = '';
   showToast(`Added "${name}" — fetching…`, 'success');
 
@@ -1203,10 +1205,10 @@ function init() {
   const cached = loadCachedArticles();
   if (cached.length) {
     state.articles = cached.map(a => ({ ...a, date: new Date(a.date) }));
-    renderSourceFilters();
+    renderCategoryFilters();
     renderGrid();
   } else {
-    renderSourceFilters();
+    renderCategoryFilters();
     showSkeletons(12);
   }
 
