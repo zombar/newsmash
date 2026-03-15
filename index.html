@@ -325,6 +325,24 @@ body {
   margin-bottom: 10px;
 }
 
+#category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cat-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+.cat-chip:hover { border-color: var(--ink); color: var(--text); }
+.cat-chip.active { background: var(--ink); border-color: var(--ink); color: var(--ink-inv); font-weight: 600; }
+
 .source-item {
   display: flex;
   align-items: center;
@@ -504,6 +522,11 @@ select.input {
       </div>
     </div>
     <div class="settings-section">
+      <h3>Prioritise Categories</h3>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Selected categories appear at the top of your feed.</p>
+      <div id="category-chips"></div>
+    </div>
+    <div class="settings-section">
       <h3>Sources</h3>
       <div id="source-list"></div>
     </div>
@@ -536,6 +559,15 @@ const SOURCE_COLORS = [
   '#0550ae','#116329','#633c01','#a40e26','#6e40c9'
 ];
 
+const CATEGORIES = [
+  { id: 'tech',          label: 'Tech',          keywords: ['technology','software','ai','artificial intelligence','startup','coding','programming','developer','cybersecurity','machine learning','robot','quantum','chip','semiconductor','microsoft','google','apple','meta','openai','app','api','cloud','hardware'] },
+  { id: 'science',       label: 'Science',        keywords: ['science','research','study','climate','space','nasa','biology','physics','chemistry','environment','species','genome','discovery','experiment','cosmic','astronomy','vaccine','medical'] },
+  { id: 'sport',         label: 'Sport',          keywords: ['sport','football','soccer','basketball','tennis','cricket','rugby','baseball','olympics','athlete','tournament','championship','league','match','goal','score','transfer','grand prix','formula 1','f1','cycling','swimming'] },
+  { id: 'business',      label: 'Business',       keywords: ['business','economy','market','stock','finance','investment','bank','trade','inflation','recession','gdp','revenue','profit','merger','acquisition','ipo','venture','hedge fund','crypto','bitcoin'] },
+  { id: 'world',         label: 'World',          keywords: ['politics','election','government','war','conflict','military','president','minister','parliament','treaty','diplomacy','sanctions','nato','united nations','refugee','protest','coup'] },
+  { id: 'entertainment', label: 'Entertainment',  keywords: ['film','movie','music','album','celebrity','award','oscar','grammy','tv','series','streaming','netflix','disney','box office','concert','theatre','gaming','video game'] },
+];
+
 const DEFAULT_SOURCES = [
   { id: 's1', name: 'Hacker News',  url: 'https://hnrss.org/frontpage',                          enabled: true  },
   { id: 's2', name: 'BBC News',     url: 'http://feeds.bbci.co.uk/news/rss.xml',                  enabled: true  },
@@ -549,6 +581,7 @@ const state = {
   sources: [],
   articles: [],
   activeFilter: 'all',
+  priorityCategories: [],
   refreshInterval: 5,
   articleMaxAgeDays: 7,
   refreshTimer: null,
@@ -564,6 +597,7 @@ function loadSettings() {
       state.sources = data.sources || DEFAULT_SOURCES;
       state.refreshInterval = data.refreshInterval || 5;
       state.articleMaxAgeDays = data.articleMaxAgeDays || 7;
+      state.priorityCategories = data.priorityCategories || [];
     } else {
       state.sources = DEFAULT_SOURCES.map(s => ({ ...s }));
     }
@@ -577,6 +611,7 @@ function saveSettings() {
     sources: state.sources,
     refreshInterval: state.refreshInterval,
     articleMaxAgeDays: state.articleMaxAgeDays,
+    priorityCategories: state.priorityCategories,
   }));
 }
 
@@ -746,6 +781,7 @@ async function fetchAll() {
   updateRefreshBtn(false);
   renderGrid();
   scheduleRefresh();
+  startAutoScroll();
 }
 
 // ── Time ──
@@ -762,10 +798,25 @@ function timeAgo(date) {
 }
 
 // ── Rendering ──
+function articleMatchesCategories(article, catIds) {
+  if (!catIds.length) return false;
+  const haystack = (article.title + ' ' + article.description).toLowerCase();
+  return catIds.some(cid => {
+    const cat = CATEGORIES.find(c => c.id === cid);
+    return cat && cat.keywords.some(kw => haystack.includes(kw));
+  });
+}
+
 function filteredArticles() {
-  return state.activeFilter === 'all'
+  const list = state.activeFilter === 'all'
     ? state.articles
     : state.articles.filter(a => a.sourceId === state.activeFilter);
+
+  if (!state.priorityCategories.length) return list;
+
+  const priority = [], rest = [];
+  list.forEach(a => (articleMatchesCategories(a, state.priorityCategories) ? priority : rest).push(a));
+  return [...priority, ...rest];
 }
 
 function renderGrid() {
@@ -839,7 +890,24 @@ function openSettings() {
   document.body.style.overflow = 'hidden';
   document.getElementById('interval-select').value = String(state.refreshInterval);
   document.getElementById('retention-select').value = String(state.articleMaxAgeDays);
+  renderCategoryChips();
   renderSourceList();
+}
+
+function renderCategoryChips() {
+  document.getElementById('category-chips').innerHTML = CATEGORIES.map(c => {
+    const active = state.priorityCategories.includes(c.id);
+    return `<button class="cat-chip ${active ? 'active' : ''}" onclick="toggleCategory('${c.id}')">${c.label}</button>`;
+  }).join('');
+}
+
+function toggleCategory(id) {
+  const idx = state.priorityCategories.indexOf(id);
+  if (idx === -1) state.priorityCategories.push(id);
+  else state.priorityCategories.splice(idx, 1);
+  saveSettings();
+  renderCategoryChips();
+  renderGrid();
 }
 
 function closeSettings() {
@@ -942,6 +1010,33 @@ function scheduleRefresh() {
   state.refreshTimer = setTimeout(() => fetchAll(), ms);
 }
 
+// ── Autoscroll ──
+let autoScrollRaf = null;
+let autoScrollCancelled = false;
+
+function startAutoScroll() {
+  if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
+  autoScrollCancelled = false;
+
+  // Small delay so the grid has painted
+  setTimeout(() => {
+    const speed = 0.6; // px per frame
+    function step() {
+      if (autoScrollCancelled) return;
+      const maxY = document.documentElement.scrollHeight - window.innerHeight;
+      if (window.scrollY >= maxY) return;
+      window.scrollBy(0, speed);
+      autoScrollRaf = requestAnimationFrame(step);
+    }
+    autoScrollRaf = requestAnimationFrame(step);
+  }, 800);
+}
+
+function cancelAutoScroll() {
+  autoScrollCancelled = true;
+  if (autoScrollRaf) { cancelAnimationFrame(autoScrollRaf); autoScrollRaf = null; }
+}
+
 function updateRefreshBtn(loading) {
   const btn = document.getElementById('refresh-btn');
   btn.classList.toggle('loading', loading);
@@ -990,6 +1085,11 @@ function init() {
     renderGrid();
     showToast(`Keeping articles for ${state.articleMaxAgeDays} day(s)`, 'success');
   });
+  // Cancel autoscroll on any user scroll or key interaction
+  window.addEventListener('wheel',     cancelAutoScroll, { passive: true });
+  window.addEventListener('touchmove', cancelAutoScroll, { passive: true });
+  window.addEventListener('keydown',   cancelAutoScroll, { passive: true });
+
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeSettings(); }
     if ((e.key === 'r' || e.key === 'R') &&
