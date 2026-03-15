@@ -78,6 +78,9 @@
       }
 
       #logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         font-family: Impact, "Arial Narrow", Arial, sans-serif;
         font-size: 22px;
         font-weight: 400;
@@ -86,6 +89,12 @@
         white-space: nowrap;
         flex-shrink: 0;
         text-transform: uppercase;
+      }
+
+      #logo img {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
       }
 
       #header-right {
@@ -648,7 +657,10 @@
   </head>
   <body>
     <header id="header">
-      <div id="logo">NEWSMASH.IO</div>
+      <div id="logo">
+        <img src="icons/icon-192.png" alt="" />
+        NEWSMASH.IO
+      </div>
       <div id="header-right">
         <button class="icon-btn" id="theme-btn" title="Toggle theme">
           <svg id="theme-icon-sun" viewBox="0 0 24 24" style="display: none">
