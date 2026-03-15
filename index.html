@@ -305,20 +305,14 @@
         font-size: 13px;
       }
 
-      .spinner-svg {
+      #spinner::before {
+        content: "";
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border);
+        border-top-color: var(--ink);
+        border-radius: 50%;
         animation: spin 0.8s linear infinite;
-      }
-      .spinner-track {
-        fill: none;
-        stroke: var(--border);
-        stroke-width: 3;
-      }
-      .spinner-arc {
-        fill: none;
-        stroke: var(--ink);
-        stroke-width: 3;
-        stroke-linecap: round;
-        stroke-dasharray: 27 80;
       }
 
       .loader-privacy-note {
@@ -1244,10 +1238,6 @@
 
       function showSpinner() {
         document.getElementById("grid").innerHTML = `<div id="spinner">
-    <svg class="spinner-svg" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle class="spinner-track" cx="20" cy="20" r="17"/>
-      <circle class="spinner-arc" cx="20" cy="20" r="17"/>
-    </svg>
     Loading…
     <p class="loader-privacy-note">Your data stays on your device — nothing is sent to any server. Usage tracked anonymously via <a href="https://umami.is" target="_blank" rel="noopener">Umami</a>.</p>
   </div>`;
