@@ -1080,41 +1080,39 @@
 
         if (!state.articles.length) showSpinner();
 
-        const results = await Promise.allSettled(enabled.map((s) => fetchFeed(s)));
-
-        const incoming = [];
-        let errCount = 0;
-        results.forEach((r, i) => {
-          if (r.status === "fulfilled") incoming.push(...r.value);
-          else {
-            errCount++;
-            console.warn(`Feed error [${enabled[i].name}]:`, r.reason);
-          }
-        });
-
-        if (errCount > 0 && !incoming.length && !state.articles.length)
-          showToast(`Failed to load ${errCount} feed(s).`, "error");
-        else if (errCount > 0) showToast(`${errCount} feed(s) failed`, "error");
-
-        // Merge incoming with existing, deduplicate, expire, sort
         const cutoff = Date.now() - state.articleMaxAgeDays * 86400000;
-        const seen = new Set();
-        const merged = [...incoming, ...state.articles]
-          .filter((a) => {
-            if (seen.has(a.id)) return false;
-            seen.add(a.id);
-            return true;
-          })
-          .filter((a) => new Date(a.date).getTime() > cutoff)
-          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        let completed = 0;
+        let errCount = 0;
 
-        state.articles = merged;
-        cacheArticles(merged);
-        state.loading = false;
-        updateRefreshBtn(false);
-        renderGrid();
-        scheduleRefresh();
-        startAutoScroll();
+        await Promise.allSettled(
+          enabled.map((s) =>
+            fetchFeed(s)
+              .then((articles) => {
+                const seen = new Set(state.articles.map((a) => a.id));
+                const fresh = articles.filter((a) => !seen.has(a.id) && new Date(a.date).getTime() > cutoff);
+                if (fresh.length) {
+                  state.articles = [...state.articles, ...fresh].sort((a, b) => new Date(b.date) - new Date(a.date));
+                  renderGrid();
+                }
+              })
+              .catch((err) => {
+                errCount++;
+                console.warn(`Feed error [${s.name}]:`, err);
+              })
+              .finally(() => {
+                completed++;
+                if (completed === enabled.length) {
+                  cacheArticles(state.articles);
+                  state.loading = false;
+                  updateRefreshBtn(false);
+                  if (errCount > 0 && !state.articles.length) showToast(`Failed to load ${errCount} feed(s).`, "error");
+                  else if (errCount > 0) showToast(`${errCount} feed(s) failed`, "error");
+                  scheduleRefresh();
+                  startAutoScroll();
+                }
+              }),
+          ),
+        );
       }
 
       // ── Time ──
