@@ -42,6 +42,11 @@
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="e975534c-2a41-48e5-aea5-8a825841b4d2"
+    ></script>
     <style>
       *,
       *::before,
@@ -310,6 +315,22 @@
         animation: spin 0.8s linear infinite;
       }
 
+      .loader-privacy-note {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--text-muted);
+        padding: 10px 12px;
+        line-height: 1.5;
+        max-width: 420px;
+        text-align: left;
+      }
+      .loader-privacy-note a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
       /* ── Empty state ── */
       #empty-state {
         grid-column: 1/-1;
@@ -348,6 +369,21 @@
       }
       .btn-secondary:hover {
         border-color: var(--ink);
+      }
+
+      .settings-privacy-note {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--text-muted);
+        padding: 10px 12px;
+        margin: 0;
+        line-height: 1.5;
+      }
+      .settings-privacy-note a {
+        color: inherit;
+        text-decoration: underline;
       }
 
       /* ── Settings Drawer ── */
@@ -724,6 +760,11 @@
         </button>
       </div>
       <div id="settings-body">
+        <p class="settings-privacy-note">
+          Your data stays on your device — nothing is sent to any server. Usage is tracked anonymously via
+          <a href="https://umami.is" target="_blank" rel="noopener">Umami</a>
+          .
+        </p>
         <div class="settings-section">
           <h3>Articles</h3>
           <div class="setting-row">
@@ -772,10 +813,6 @@
           </div>
         </div>
         <div class="settings-section">
-          <h3>Sources</h3>
-          <div id="source-list"></div>
-        </div>
-        <div class="settings-section">
           <h3>Add Source</h3>
           <div id="add-source-form">
             <input class="input" id="new-source-name" type="text" placeholder="Source name (e.g. Reuters)" />
@@ -784,6 +821,10 @@
               <button class="btn btn-primary" onclick="addSource()">Add</button>
             </div>
           </div>
+        </div>
+        <div class="settings-section">
+          <h3>Sources</h3>
+          <div id="source-list"></div>
         </div>
       </div>
     </div>
@@ -1196,7 +1237,10 @@
       }
 
       function showSpinner() {
-        document.getElementById("grid").innerHTML = `<div id="spinner">Loading…</div>`;
+        document.getElementById("grid").innerHTML = `<div id="spinner">
+    Loading…
+    <p class="loader-privacy-note">Your data stays on your device — nothing is sent to any server. Usage tracked anonymously via <a href="https://umami.is" target="_blank" rel="noopener">Umami</a>.</p>
+  </div>`;
       }
 
       // ── Settings ──
@@ -1253,7 +1297,12 @@
           return;
         }
         const defaultIds = new Set(DEFAULT_SOURCES.map((s) => s.id));
-        list.innerHTML = state.sources
+        const sorted = [...state.sources].sort((a, b) => {
+          const aC = !defaultIds.has(a.id),
+            bC = !defaultIds.has(b.id);
+          return aC === bC ? 0 : aC ? -1 : 1;
+        });
+        list.innerHTML = sorted
           .map((s) => {
             const deleteBtn = defaultIds.has(s.id)
               ? ""
