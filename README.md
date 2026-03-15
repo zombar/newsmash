@@ -27,14 +27,14 @@ A single-file RSS news aggregator. No build step, no backend — drop `index.htm
 
 ### Using an apex domain (e.g. `newsmash.io`)
 
-1. In your DNS provider add these **A records** pointing to GitHub's servers:
+1. In your DNS provider, create four **A records**. Set the **host/name** field to `@` (meaning the root domain) and the **value/points to** field to each of these GitHub Pages IPs:
 
-   ```
-   185.199.108.153
-   185.199.109.153
-   185.199.110.153
-   185.199.111.153
-   ```
+   | Host | Type | Value           |
+   |------|------|-----------------|
+   | `@`  | A    | 185.199.108.153 |
+   | `@`  | A    | 185.199.109.153 |
+   | `@`  | A    | 185.199.110.153 |
+   | `@`  | A    | 185.199.111.153 |
 
 2. Also add an **AAAA record** set for IPv6 (optional but recommended — see [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)).
 
