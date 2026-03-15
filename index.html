@@ -480,6 +480,49 @@ select.input {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Search Bar ── */
+#search-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--header-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  z-index: 200;
+  width: min(480px, calc(100vw - 48px));
+  transition: opacity 0.2s;
+}
+#search-bar svg { color: var(--text-muted); flex-shrink: 0; }
+#search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+#search-input::placeholder { color: var(--text-muted); }
+#search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  display: none;
+}
+#search-clear:hover { color: var(--text); }
+#search-bar.has-query #search-clear { display: block; }
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   #grid { grid-template-columns: 1fr; }
@@ -511,6 +554,12 @@ select.input {
 <main id="main">
   <div id="grid"></div>
 </main>
+
+<div id="search-bar">
+  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input id="search-input" type="search" placeholder="Search articles…" autocomplete="off" spellcheck="false">
+  <button id="search-clear" title="Clear">×</button>
+</div>
 
 
 <!-- Settings Drawer -->
@@ -664,6 +713,7 @@ const state = {
   sources: [],
   articles: [],
   activeFilter: 'all',
+  searchQuery: '',
   priorityCategories: [],
   refreshInterval: 5,
   articleMaxAgeDays: 7,
@@ -939,6 +989,15 @@ function filteredArticles() {
     list = state.articles.filter(a => articleMatchesCategories(a, [state.activeFilter]));
   } else {
     list = state.articles.filter(a => a.sourceId === state.activeFilter);
+  }
+
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    list = list.filter(a =>
+      a.title.toLowerCase().includes(q) ||
+      a.description.toLowerCase().includes(q) ||
+      a.sourceName.toLowerCase().includes(q)
+    );
   }
 
   if (!state.priorityCategories.length) return interleaveArticles(list);
@@ -1235,8 +1294,38 @@ function init() {
   window.addEventListener('touchmove', pauseAutoScroll, { passive: true });
   window.addEventListener('keydown',   pauseAutoScroll, { passive: true });
 
+  // Search bar
+  const searchInput = document.getElementById('search-input');
+  const searchBar   = document.getElementById('search-bar');
+  let searchDebounce;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      state.searchQuery = searchInput.value.trim();
+      searchBar.classList.toggle('has-query', !!state.searchQuery);
+      renderGrid();
+    }, 200);
+  });
+  document.getElementById('search-clear').addEventListener('click', () => {
+    searchInput.value = '';
+    state.searchQuery = '';
+    searchBar.classList.remove('has-query');
+    renderGrid();
+    searchInput.focus();
+  });
+  // Prevent autoscroll pause while typing in search
+  searchInput.addEventListener('keydown', e => e.stopPropagation());
+
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeSettings(); }
+    if (e.key === 'Escape') {
+      closeSettings();
+      if (state.searchQuery) {
+        searchInput.value = '';
+        state.searchQuery = '';
+        searchBar.classList.remove('has-query');
+        renderGrid();
+      }
+    }
     if ((e.key === 'r' || e.key === 'R') &&
         document.activeElement.tagName !== 'INPUT' &&
         document.activeElement.tagName !== 'TEXTAREA') fetchAll();
