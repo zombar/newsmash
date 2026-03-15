@@ -143,7 +143,7 @@ body {
   border-radius: 0;
   overflow: hidden;
   cursor: pointer;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition: box-shadow 0.2s, transform 0.2s;
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -168,8 +168,9 @@ body {
 .card--compact .card-desc  { display: none; }
 
 .card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  border-color: var(--ink);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transform: scale(1.03);
+  z-index: 1;
 }
 
 .card-img {
@@ -309,7 +310,9 @@ body {
   width: 400px;
   max-width: 100vw;
   height: 100vh;
-  background: var(--bg);
+  background: var(--header-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-left: 1px solid var(--border);
   z-index: 301;
   display: flex;
