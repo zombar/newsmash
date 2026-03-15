@@ -36,11 +36,19 @@ A single-file RSS news aggregator. No build step, no backend — drop `index.htm
    | `@`  | A    | 185.199.110.153 |
    | `@`  | A    | 185.199.111.153 |
 
-2. Also add an **AAAA record** set for IPv6 (optional but recommended — see [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)).
+2. To redirect `www.newsmash.io` → `newsmash.io`, add a CNAME record for `www`:
 
-3. In **Settings → Pages → Custom domain**, enter your domain and click **Save**. GitHub creates a `CNAME` file in the repo root automatically.
+   | Host  | Type  | Value                 |
+   |-------|-------|-----------------------|
+   | `www` | CNAME | `<username>.github.io` |
 
-4. Wait for DNS to propagate (~5 min to 1 hour), then enable **Enforce HTTPS**.
+   GitHub Pages automatically issues a 301 redirect from `www` to the apex when both are configured.
+
+3. Also add an **AAAA record** set for IPv6 (optional but recommended — see [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)).
+
+4. In **Settings → Pages → Custom domain**, enter the apex domain (e.g. `newsmash.io`) and click **Save**. GitHub creates a `CNAME` file in the repo root automatically.
+
+5. Wait for DNS to propagate (~5 min to 1 hour), then enable **Enforce HTTPS**.
 
 ### Using a subdomain (e.g. `app.example.com`)
 
