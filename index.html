@@ -1,910 +1,1118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEWSMASH.IO</title>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEWSMASH.IO</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-:root {
-  --bg: #ffffff;
-  --card: #f6f8fa;
-  --border: #d0d7de;
-  --text: #1f2328;
-  --text-muted: #656d76;
-  --danger: #cf222e;
-  --success: #1a7f37;
-  --overlay: rgba(0,0,0,0.45);
-  --header-h: 56px;
-  --ink: #000;
-  --ink-inv: #fff;
-  --shimmer-a: #f0f2f4;
-  --shimmer-b: #e8ebee;
-  --header-bg: rgba(255,255,255,0.55);
-}
+      :root {
+        --bg: #ffffff;
+        --card: #f6f8fa;
+        --border: #d0d7de;
+        --text: #1f2328;
+        --text-muted: #656d76;
+        --danger: #cf222e;
+        --success: #1a7f37;
+        --overlay: rgba(0, 0, 0, 0.45);
+        --header-h: 56px;
+        --ink: #000;
+        --ink-inv: #fff;
+        --shimmer-a: #f0f2f4;
+        --shimmer-b: #e8ebee;
+        --header-bg: rgba(255, 255, 255, 0.55);
+      }
 
-html.dark {
-  --bg: #0d1117;
-  --card: #161b22;
-  --border: #30363d;
-  --text: #e6edf3;
-  --text-muted: #8b949e;
-  --overlay: rgba(0,0,0,0.7);
-  --ink: #fff;
-  --ink-inv: #000;
-  --shimmer-a: #161b22;
-  --shimmer-b: #21262d;
-  --header-bg: rgba(13,17,23,0.55);
-}
+      html.dark {
+        --bg: #0d1117;
+        --card: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --text-muted: #8b949e;
+        --overlay: rgba(0, 0, 0, 0.7);
+        --ink: #fff;
+        --ink-inv: #000;
+        --shimmer-a: #161b22;
+        --shimmer-b: #21262d;
+        --header-bg: rgba(13, 17, 23, 0.55);
+      }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
-}
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        min-height: 100vh;
+      }
 
-/* ── Header ── */
-#header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--header-bg);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-}
+      /* ── Header ── */
+      #header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--header-bg);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        height: var(--header-h);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+      }
 
-#logo {
-  font-family: Impact, 'Arial Narrow', Arial, sans-serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--ink);
-  letter-spacing: 1px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  text-transform: uppercase;
-}
+      #logo {
+        font-family: Impact, "Arial Narrow", Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 400;
+        color: var(--ink);
+        letter-spacing: 1px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        text-transform: uppercase;
+      }
 
+      #header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
 
-#header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
+      .icon-btn {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 0;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.15s;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .icon-btn:hover {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+      .icon-btn.loading {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .icon-btn svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
 
+      /* ── Grid ── */
+      #main {
+        padding: 16px;
+      }
 
-.icon-btn {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 0;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: all 0.15s;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.icon-btn:hover { border-color: var(--ink); color: var(--ink); }
-.icon-btn.loading { opacity: 0.4; pointer-events: none; }
-.icon-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      #grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-auto-rows: 95px;
+        grid-auto-flow: row dense;
+        gap: 16px;
+      }
 
-/* ── Grid ── */
-#main { padding: 16px; }
+      /* ── Card ── */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        overflow: hidden;
+        cursor: pointer;
+        transition:
+          box-shadow 0.2s,
+          transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+        grid-row: span 3;
+      }
+      .card:visited {
+        color: inherit;
+      }
+      .card:visited::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 18px;
+        height: 18px;
+        background: #1a7f37
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")
+          no-repeat center / 12px;
+      }
+      .card--compact {
+        grid-row: span 1;
+      }
+      .card--compact .card-title {
+        -webkit-line-clamp: 2;
+      }
+      .card--compact .card-desc {
+        display: none;
+      }
 
-#grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: 95px;
-  grid-auto-flow: row dense;
-  gap: 16px;
-}
+      .card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        transform: scale(1.03);
+        z-index: 1;
+      }
 
-/* ── Card ── */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  overflow: hidden;
-  cursor: pointer;
-  transition: box-shadow 0.2s, transform 0.2s;
-  display: flex;
-  flex-direction: column;
-  text-decoration: none;
-  color: inherit;
-  position: relative;
-  grid-row: span 3;
-}
-.card:visited { color: inherit; }
-.card:visited::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 18px;
-  height: 18px;
-  background: #1a7f37 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center / 12px;
-}
-.card--compact {
-  grid-row: span 1;
-}
-.card--compact .card-title { -webkit-line-clamp: 2; }
-.card--compact .card-desc  { display: none; }
+      .card-img {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        background: var(--border);
+        display: block;
+        flex-shrink: 0;
+        max-height: 62%;
+      }
 
-.card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  transform: scale(1.03);
-  z-index: 1;
-}
+      .card-placeholder {
+        width: 100%;
+        aspect-ratio: 16/9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 700;
+        color: rgba(128, 128, 128, 0.25);
+        flex-shrink: 0;
+      }
 
-.card-img {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  background: var(--border);
-  display: block;
-  flex-shrink: 0;
-  max-height: 62%;
-}
+      .card-body {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+      }
 
-.card-placeholder {
-  width: 100%;
-  aspect-ratio: 16/9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  font-weight: 700;
-  color: rgba(128,128,128,0.25);
-  flex-shrink: 0;
-}
+      .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
 
-.card-body {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
 
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--text-muted);
-}
+      .card-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
 
+      /* ── Shimmer skeleton ── */
+      .skeleton {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        overflow: hidden;
+      }
 
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+      .shimmer {
+        background: linear-gradient(90deg, var(--shimmer-a) 0%, var(--shimmer-b) 50%, var(--shimmer-a) 100%);
+        background-size: 400% 100%;
+        animation: shimmer 2.5s ease-in-out infinite;
+      }
 
-.card-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+      @keyframes shimmer {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: -100% 0;
+        }
+      }
 
-/* ── Shimmer skeleton ── */
-.skeleton {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  overflow: hidden;
-}
+      .skel-img {
+        width: 100%;
+        aspect-ratio: 16/9;
+      }
+      .skel-body {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .skel-line {
+        height: 11px;
+        border-radius: 0;
+        background: var(--shimmer-b);
+      }
+      .skel-line.short {
+        width: 55%;
+      }
+      .skel-line.medium {
+        width: 80%;
+      }
+      .skel-line.long {
+        width: 100%;
+      }
+      .skel-line.title {
+        height: 15px;
+      }
 
-.shimmer {
-  background: linear-gradient(90deg, var(--shimmer-a) 0%, var(--shimmer-b) 50%, var(--shimmer-a) 100%);
-  background-size: 400% 100%;
-  animation: shimmer 2.5s ease-in-out infinite;
-}
+      /* ── Empty state ── */
+      #empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--text-muted);
+      }
+      #empty-state h2 {
+        font-size: 20px;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
 
-@keyframes shimmer {
-  0%   { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
-}
+      .btn {
+        padding: 8px 16px;
+        border-radius: 0;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.15s;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-primary {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--ink-inv);
+      }
+      .btn-primary:hover {
+        opacity: 0.85;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--text);
+      }
+      .btn-secondary:hover {
+        border-color: var(--ink);
+      }
 
-.skel-img { width: 100%; aspect-ratio: 16/9; }
-.skel-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-.skel-line { height: 11px; border-radius: 0; background: var(--shimmer-b); }
-.skel-line.short { width: 55%; }
-.skel-line.medium { width: 80%; }
-.skel-line.long { width: 100%; }
-.skel-line.title { height: 15px; }
+      /* ── Settings Drawer ── */
+      #settings-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: var(--overlay);
+        z-index: 300;
+      }
+      #settings-overlay.open {
+        display: block;
+      }
 
-/* ── Empty state ── */
-#empty-state {
-  grid-column: 1/-1;
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--text-muted);
-}
-#empty-state h2 { font-size: 20px; margin-bottom: 8px; color: var(--text); }
+      #settings-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 400px;
+        max-width: 100vw;
+        height: 100vh;
+        background: var(--header-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-left: 1px solid var(--border);
+        z-index: 301;
+        display: flex;
+        flex-direction: column;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        overflow: hidden;
+      }
+      #settings-drawer.open {
+        transform: translateX(0);
+      }
 
+      #settings-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      #settings-header h2 {
+        font-size: 16px;
+      }
 
-.btn {
-  padding: 8px 16px;
-  border-radius: 0;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.15s;
-  text-decoration: none;
-  display: inline-block;
-}
-.btn-primary { background: var(--ink); border-color: var(--ink); color: var(--ink-inv); }
-.btn-primary:hover { opacity: 0.85; }
-.btn-secondary { background: transparent; color: var(--text); }
-.btn-secondary:hover { border-color: var(--ink); }
+      #settings-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
 
-/* ── Settings Drawer ── */
-#settings-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--overlay);
-  z-index: 300;
-}
-#settings-overlay.open { display: block; }
+      .settings-section h3 {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+      }
 
-#settings-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 400px;
-  max-width: 100vw;
-  height: 100vh;
-  background: var(--header-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-left: 1px solid var(--border);
-  z-index: 301;
-  display: flex;
-  flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 0.25s ease;
-  overflow: hidden;
-}
-#settings-drawer.open { transform: translateX(0); }
+      .source-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        margin-bottom: 8px;
+      }
 
-#settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-#settings-header h2 { font-size: 16px; }
+      .source-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .source-name {
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .source-url {
+        font-size: 11px;
+        color: var(--text-muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-#settings-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
+      .toggle {
+        width: 36px;
+        height: 20px;
+        border-radius: 10px;
+        background: var(--border);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        transition: background 0.2s;
+        flex-shrink: 0;
+      }
+      .toggle::after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        top: 3px;
+        left: 3px;
+        transition:
+          left 0.2s,
+          background 0.2s;
+      }
+      .toggle.on {
+        background: var(--ink);
+      }
+      .toggle.on::after {
+        left: 19px;
+        background: var(--ink-inv);
+      }
 
-.settings-section h3 {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-}
+      .delete-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 0;
+        transition: color 0.15s;
+        line-height: 1;
+        font-size: 16px;
+      }
+      .delete-btn:hover {
+        color: var(--danger);
+      }
 
+      #add-source-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
+      .input {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        color: var(--text);
+        padding: 8px 12px;
+        font-size: 13px;
+        width: 100%;
+        transition: border-color 0.15s;
+      }
+      .input:focus {
+        outline: none;
+        border-color: var(--ink);
+      }
+      .input::placeholder {
+        color: var(--text-muted);
+      }
 
-.source-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  margin-bottom: 8px;
-}
+      .input-row {
+        display: flex;
+        gap: 8px;
+      }
+      .input-row .input {
+        flex: 1;
+      }
 
+      select.input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23656d76' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 30px;
+        cursor: pointer;
+      }
 
-.source-info { flex: 1; min-width: 0; }
-.source-name { font-size: 13px; font-weight: 500; }
-.source-url { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #interval-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      #interval-row label {
+        font-size: 13px;
+        white-space: nowrap;
+      }
 
-.toggle {
-  width: 36px;
-  height: 20px;
-  border-radius: 10px;
-  background: var(--border);
-  border: none;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.2s;
-  flex-shrink: 0;
-}
-.toggle::after {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #fff;
-  top: 3px;
-  left: 3px;
-  transition: left 0.2s, background 0.2s;
-}
-.toggle.on { background: var(--ink); }
-.toggle.on::after { left: 19px; background: var(--ink-inv); }
+      .setting-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .setting-row label {
+        font-size: 13px;
+      }
 
-.delete-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 0;
-  transition: color 0.15s;
-  line-height: 1;
-  font-size: 16px;
-}
-.delete-btn:hover { color: var(--danger); }
+      /* ── Toast ── */
+      #toast {
+        position: fixed;
+        bottom: 110px;
+        left: 50%;
+        transform: translateX(-50%) translateY(120px);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        padding: 10px 20px;
+        font-size: 13px;
+        z-index: 500;
+        transition: transform 0.3s ease;
+        pointer-events: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      }
+      #toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+      #toast.error {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      #toast.success {
+        border-color: var(--success);
+        color: var(--success);
+      }
 
-#add-source-form { display: flex; flex-direction: column; gap: 8px; }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-.input {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  color: var(--text);
-  padding: 8px 12px;
-  font-size: 13px;
-  width: 100%;
-  transition: border-color 0.15s;
-}
-.input:focus { outline: none; border-color: var(--ink); }
-.input::placeholder { color: var(--text-muted); }
+      /* ── Search Bar ── */
+      #search-bar {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 28px;
+        background: var(--header-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 3px solid var(--ink);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+        z-index: 200;
+        width: min(1440px, calc(100vw - 48px));
+        transition: opacity 0.2s;
+      }
+      #search-bar svg {
+        color: var(--text-muted);
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+      }
+      #search-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 20px;
+        color: var(--text);
+        outline: none;
+        min-width: 0;
+      }
+      #search-input::placeholder {
+        color: var(--text-muted);
+      }
+      #search-clear {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 18px;
+        line-height: 1;
+        padding: 0 2px;
+        display: none;
+      }
+      #search-clear:hover {
+        color: var(--text);
+      }
+      #search-bar.has-query #search-clear {
+        display: block;
+      }
 
-.input-row { display: flex; gap: 8px; }
-.input-row .input { flex: 1; }
-
-select.input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23656d76' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px;
-  cursor: pointer;
-}
-
-#interval-row { display: flex; align-items: center; gap: 12px; }
-#interval-row label { font-size: 13px; white-space: nowrap; }
-
-.setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-.setting-row label { font-size: 13px; }
-
-/* ── Toast ── */
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  padding: 10px 20px;
-  font-size: 13px;
-  z-index: 500;
-  transition: transform 0.3s ease;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-}
-#toast.show { transform: translateX(-50%) translateY(0); }
-#toast.error { border-color: var(--danger); color: var(--danger); }
-#toast.success { border-color: var(--success); color: var(--success); }
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Search Bar ── */
-#search-bar {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 28px;
-  background: var(--header-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 3px solid var(--ink);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-  z-index: 200;
-  width: min(1440px, calc(100vw - 48px));
-  transition: opacity 0.2s;
-}
-#search-bar svg { color: var(--text-muted); flex-shrink: 0; width: 22px; height: 22px; }
-#search-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 20px;
-  color: var(--text);
-  outline: none;
-  min-width: 0;
-}
-#search-input::placeholder { color: var(--text-muted); }
-#search-clear {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 18px;
-  line-height: 1;
-  padding: 0 2px;
-  display: none;
-}
-#search-clear:hover { color: var(--text); }
-#search-bar.has-query #search-clear { display: block; }
-
-/* ── Responsive ── */
-@media (max-width: 600px) {
-  #grid { grid-template-columns: 1fr; }
-  #logo { font-size: 18px; }
-  #refresh-countdown { display: none; }
-  #settings-drawer { width: 100vw; }
-}
-</style>
-</head>
-<body>
-
-<header id="header">
-  <div id="logo">NEWSMASH.IO</div>
-  <div id="header-right">
-    <button class="icon-btn" id="theme-btn" title="Toggle theme">
-      <svg id="theme-icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <svg id="theme-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
-    <button class="icon-btn" id="refresh-btn" title="Refresh (R)">
-      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-    </button>
-    <button class="icon-btn" id="settings-btn" title="Settings">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
-  </div>
-</header>
-
-<main id="main">
-  <div id="grid"></div>
-</main>
-
-<div id="search-bar">
-  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input id="search-input" type="search" placeholder="Search articles…" autocomplete="off" spellcheck="false">
-  <button id="search-clear" title="Clear">×</button>
-</div>
-
-
-<!-- Settings Drawer -->
-<div id="settings-overlay" onclick="closeSettings()"></div>
-<div id="settings-drawer">
-  <div id="settings-header">
-    <h2>Settings</h2>
-    <button class="icon-btn" onclick="closeSettings()">
-      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div id="settings-body">
-    <div class="settings-section">
-      <h3>Articles</h3>
-      <div class="setting-row">
-        <label>Open in new tab</label>
-        <button class="toggle" id="newtab-toggle" onclick="toggleNewTab()"></button>
+      /* ── Responsive ── */
+      @media (max-width: 600px) {
+        #grid {
+          grid-template-columns: 1fr;
+        }
+        #logo {
+          font-size: 18px;
+        }
+        #refresh-countdown {
+          display: none;
+        }
+        #settings-drawer {
+          width: 100vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header id="header">
+      <div id="logo">NEWSMASH.IO</div>
+      <div id="header-right">
+        <button class="icon-btn" id="theme-btn" title="Toggle theme">
+          <svg id="theme-icon-sun" viewBox="0 0 24 24" style="display: none">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+          <svg id="theme-icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+        <button class="icon-btn" id="refresh-btn" title="Refresh (R)">
+          <svg viewBox="0 0 24 24">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+        </button>
+        <button class="icon-btn" id="settings-btn" title="Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
+        </button>
       </div>
+    </header>
+
+    <main id="main">
+      <div id="grid"></div>
+    </main>
+
+    <div id="search-bar">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <input id="search-input" type="search" placeholder="Search articles…" autocomplete="off" spellcheck="false" />
+      <button id="search-clear" title="Clear">×</button>
     </div>
-    <div class="settings-section">
-      <h3>Auto-scroll</h3>
-      <div class="setting-row">
-        <label>Enable auto-scroll</label>
-        <button class="toggle" id="autoscroll-toggle" onclick="toggleAutoScroll()"></button>
+
+    <!-- Settings Drawer -->
+    <div id="settings-overlay" onclick="closeSettings()"></div>
+    <div id="settings-drawer">
+      <div id="settings-header">
+        <h2>Settings</h2>
+        <button class="icon-btn" onclick="closeSettings()">
+          <svg viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
-      <div class="setting-row" id="autoscroll-resume-row">
-        <label for="resume-select">Resume after inactivity</label>
-        <select class="input" id="resume-select" style="width:auto">
-          <option value="5">5 sec</option>
-          <option value="10" selected>10 sec</option>
-          <option value="20">20 sec</option>
-          <option value="30">30 sec</option>
-          <option value="60">1 min</option>
-        </select>
-      </div>
-    </div>
-    <div class="settings-section">
-      <h3>Auto Refresh</h3>
-      <div id="interval-row">
-        <label for="interval-select">Refresh every</label>
-        <select class="input" id="interval-select" style="width:auto">
-          <option value="1">1 min</option>
-          <option value="5" selected>5 min</option>
-          <option value="10">10 min</option>
-          <option value="30">30 min</option>
-          <option value="60">60 min</option>
-        </select>
-      </div>
-      <div id="interval-row" style="margin-top:10px">
-        <label for="retention-select">Keep articles for</label>
-        <select class="input" id="retention-select" style="width:auto">
-          <option value="1">1 day</option>
-          <option value="3">3 days</option>
-          <option value="7" selected>7 days</option>
-          <option value="14">14 days</option>
-          <option value="30">30 days</option>
-        </select>
-      </div>
-    </div>
-    <div class="settings-section">
-      <h3>Sources</h3>
-      <div id="source-list"></div>
-    </div>
-    <div class="settings-section">
-      <h3>Add Source</h3>
-      <div id="add-source-form">
-        <input class="input" id="new-source-name" type="text" placeholder="Source name (e.g. Reuters)">
-        <div class="input-row">
-          <input class="input" id="new-source-url" type="url" placeholder="RSS/Atom feed URL">
-          <button class="btn btn-primary" onclick="addSource()">Add</button>
+      <div id="settings-body">
+        <div class="settings-section">
+          <h3>Articles</h3>
+          <div class="setting-row">
+            <label>Open in new tab</label>
+            <button class="toggle" id="newtab-toggle" onclick="toggleNewTab()"></button>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Auto-scroll</h3>
+          <div class="setting-row">
+            <label>Enable auto-scroll</label>
+            <button class="toggle" id="autoscroll-toggle" onclick="toggleAutoScroll()"></button>
+          </div>
+          <div class="setting-row" id="autoscroll-resume-row">
+            <label for="resume-select">Resume after inactivity</label>
+            <select class="input" id="resume-select" style="width: auto">
+              <option value="5">5 sec</option>
+              <option value="10" selected>10 sec</option>
+              <option value="20">20 sec</option>
+              <option value="30">30 sec</option>
+              <option value="60">1 min</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Auto Refresh</h3>
+          <div id="interval-row">
+            <label for="interval-select">Refresh every</label>
+            <select class="input" id="interval-select" style="width: auto">
+              <option value="1">1 min</option>
+              <option value="5" selected>5 min</option>
+              <option value="10">10 min</option>
+              <option value="30">30 min</option>
+              <option value="60">60 min</option>
+            </select>
+          </div>
+          <div id="retention-row" style="margin-top: 10px">
+            <label for="retention-select">Keep articles for</label>
+            <select class="input" id="retention-select" style="width: auto">
+              <option value="1">1 day</option>
+              <option value="3">3 days</option>
+              <option value="7" selected>7 days</option>
+              <option value="14">14 days</option>
+              <option value="30">30 days</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Sources</h3>
+          <div id="source-list"></div>
+        </div>
+        <div class="settings-section">
+          <h3>Add Source</h3>
+          <div id="add-source-form">
+            <input class="input" id="new-source-name" type="text" placeholder="Source name (e.g. Reuters)" />
+            <div class="input-row">
+              <input class="input" id="new-source-url" type="url" placeholder="RSS/Atom feed URL" />
+              <button class="btn btn-primary" onclick="addSource()">Add</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div id="toast"></div>
+    <div id="toast"></div>
 
-<script>
-const STORAGE_KEY   = 'newsmash_v1';
-const ARTICLES_KEY  = 'newsmash_articles_v1';
-const CORS_PROXIES = [
-  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-];
+    <script>
+      const STORAGE_KEY = "newsmash_v1";
+      const ARTICLES_KEY = "newsmash_articles_v1";
+      const CORS_PROXIES = [
+        (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+      ];
 
+      const DEFAULT_SOURCES = [
+        { id: "s1", name: "Hacker News", url: "https://hnrss.org/frontpage", enabled: true, tags: ["tech"] },
+        { id: "s2", name: "BBC News", url: "http://feeds.bbci.co.uk/news/rss.xml", enabled: true },
+        { id: "s3", name: "The Guardian", url: "https://www.theguardian.com/world/rss", enabled: true },
+        { id: "s4", name: "TechCrunch", url: "https://techcrunch.com/feed/", enabled: true, tags: ["tech"] },
+        {
+          id: "s5",
+          name: "Ars Technica",
+          url: "https://feeds.arstechnica.com/arstechnica/index",
+          enabled: true,
+          tags: ["tech", "science"],
+        },
+        {
+          id: "s6",
+          name: "NASA",
+          url: "https://www.nasa.gov/rss/dyn/breaking_news.rss",
+          enabled: false,
+          tags: ["science"],
+        },
+        { id: "s7", name: "Reuters", url: "https://feeds.reuters.com/reuters/topNews", enabled: false },
+        { id: "s8", name: "Al Jazeera", url: "https://www.aljazeera.com/xml/rss/all.xml", enabled: false },
+        { id: "s9", name: "Deutsche Welle", url: "https://rss.dw.com/rdf/rss-en-all", enabled: false },
+        { id: "s10", name: "France 24", url: "https://www.france24.com/en/rss", enabled: false },
+        { id: "s11", name: "NPR News", url: "https://feeds.npr.org/1001/rss.xml", enabled: false },
+        { id: "s12", name: "The Independent", url: "https://www.independent.co.uk/news/rss", enabled: false },
+        { id: "s13", name: "Sky News", url: "https://feeds.skynews.com/feeds/rss/world.xml", enabled: false },
+        { id: "s14", name: "Sydney Morning Herald", url: "https://www.smh.com.au/rss/feed.xml", enabled: false },
+        {
+          id: "s15",
+          name: "Times of India",
+          url: "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
+          enabled: false,
+        },
+        { id: "s16", name: "South China Morning Post", url: "https://www.scmp.com/rss/91/feed", enabled: false },
+        { id: "s17", name: "The Hindu", url: "https://www.thehindu.com/feeder/default.rss", enabled: false },
+        { id: "s18", name: "Irish Times", url: "https://www.irishtimes.com/cmlink/news-1.1319492", enabled: false },
+        {
+          id: "s19",
+          name: "The Register",
+          url: "https://www.theregister.com/headlines.atom",
+          enabled: false,
+          tags: ["tech"],
+        },
+      ];
 
+      const state = {
+        sources: [],
+        articles: [],
+        searchQuery: "",
+        refreshInterval: 5,
+        articleMaxAgeDays: 7,
+        openInNewTab: false,
+        autoScrollEnabled: true,
+        autoScrollResumeDelay: 10,
+        refreshTimer: null,
+        loading: false,
+      };
 
-const DEFAULT_SOURCES = [
-  { id: 's1',  name: 'Hacker News',            url: 'https://hnrss.org/frontpage',                                        enabled: true,  tags: ['tech'] },
-  { id: 's2',  name: 'BBC News',               url: 'http://feeds.bbci.co.uk/news/rss.xml',                               enabled: true  },
-  { id: 's3',  name: 'The Guardian',           url: 'https://www.theguardian.com/world/rss',                              enabled: true  },
-  { id: 's4',  name: 'TechCrunch',             url: 'https://techcrunch.com/feed/',                                       enabled: true,  tags: ['tech'] },
-  { id: 's5',  name: 'Ars Technica',           url: 'https://feeds.arstechnica.com/arstechnica/index',                    enabled: true,  tags: ['tech', 'science'] },
-  { id: 's6',  name: 'NASA',                   url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss',                     enabled: false, tags: ['science'] },
-  { id: 's7',  name: 'Reuters',                url: 'https://feeds.reuters.com/reuters/topNews',                          enabled: false },
-  { id: 's8',  name: 'Al Jazeera',             url: 'https://www.aljazeera.com/xml/rss/all.xml',                          enabled: false },
-  { id: 's9',  name: 'Deutsche Welle',         url: 'https://rss.dw.com/rdf/rss-en-all',                                  enabled: false },
-  { id: 's10', name: 'France 24',              url: 'https://www.france24.com/en/rss',                                    enabled: false },
-  { id: 's11', name: 'NPR News',               url: 'https://feeds.npr.org/1001/rss.xml',                                 enabled: false },
-  { id: 's12', name: 'The Independent',        url: 'https://www.independent.co.uk/news/rss',                             enabled: false },
-  { id: 's13', name: 'Sky News',               url: 'https://feeds.skynews.com/feeds/rss/world.xml',                      enabled: false },
-  { id: 's14', name: 'Sydney Morning Herald',  url: 'https://www.smh.com.au/rss/feed.xml',                                enabled: false },
-  { id: 's15', name: 'Times of India',         url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',         enabled: false },
-  { id: 's16', name: 'South China Morning Post', url: 'https://www.scmp.com/rss/91/feed',                                 enabled: false },
-  { id: 's17', name: 'The Hindu',              url: 'https://www.thehindu.com/feeder/default.rss',                        enabled: false },
-  { id: 's18', name: 'Irish Times',            url: 'https://www.irishtimes.com/cmlink/news-1.1319492',                   enabled: false },
-  { id: 's19', name: 'The Register',           url: 'https://www.theregister.com/headlines.atom',                        enabled: false, tags: ['tech'] },
-];
+      // ── Storage ──
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const data = JSON.parse(raw);
+            const saved = data.sources || [];
+            const savedIds = new Set(saved.map((s) => s.id));
+            const newDefaults = DEFAULT_SOURCES.filter((s) => !savedIds.has(s.id));
+            state.sources = [...saved, ...newDefaults];
+            state.refreshInterval = data.refreshInterval || 5;
+            state.articleMaxAgeDays = data.articleMaxAgeDays || 7;
+            state.openInNewTab = data.openInNewTab === true;
+            state.autoScrollEnabled = data.autoScrollEnabled !== false;
+            state.autoScrollResumeDelay = data.autoScrollResumeDelay ?? 10;
+          } else {
+            state.sources = DEFAULT_SOURCES.map((s) => ({ ...s }));
+          }
+        } catch {
+          state.sources = DEFAULT_SOURCES.map((s) => ({ ...s }));
+        }
+      }
 
-const state = {
-  sources: [],
-  articles: [],
-  searchQuery: '',
-  refreshInterval: 5,
-  articleMaxAgeDays: 7,
-  openInNewTab: false,
-  autoScrollEnabled: true,
-  autoScrollResumeDelay: 10,
-  refreshTimer: null,
-  loading: false,
-};
+      function saveSettings() {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            sources: state.sources,
+            refreshInterval: state.refreshInterval,
+            articleMaxAgeDays: state.articleMaxAgeDays,
+            openInNewTab: state.openInNewTab,
+            autoScrollEnabled: state.autoScrollEnabled,
+            autoScrollResumeDelay: state.autoScrollResumeDelay,
+          }),
+        );
+      }
 
-// ── Storage ──
-function loadSettings() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      const saved = data.sources || [];
-      const savedIds = new Set(saved.map(s => s.id));
-      const newDefaults = DEFAULT_SOURCES.filter(s => !savedIds.has(s.id));
-      state.sources = [...saved, ...newDefaults];
-      state.refreshInterval = data.refreshInterval || 5;
-      state.articleMaxAgeDays = data.articleMaxAgeDays || 7;
-      state.openInNewTab = data.openInNewTab === true;
-      state.autoScrollEnabled = data.autoScrollEnabled !== false;
-      state.autoScrollResumeDelay = data.autoScrollResumeDelay ?? 10;
-    } else {
-      state.sources = DEFAULT_SOURCES.map(s => ({ ...s }));
-    }
-  } catch {
-    state.sources = DEFAULT_SOURCES.map(s => ({ ...s }));
-  }
-}
+      function loadCachedArticles() {
+        try {
+          const raw = localStorage.getItem(ARTICLES_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch {}
+        return [];
+      }
 
-function saveSettings() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    sources: state.sources,
-    refreshInterval: state.refreshInterval,
-    articleMaxAgeDays: state.articleMaxAgeDays,
-    openInNewTab: state.openInNewTab,
-    autoScrollEnabled: state.autoScrollEnabled,
-    autoScrollResumeDelay: state.autoScrollResumeDelay,
-  }));
-}
+      function cacheArticles(articles) {
+        try {
+          localStorage.setItem(ARTICLES_KEY, JSON.stringify(articles.slice(0, 200)));
+        } catch {}
+      }
 
-function loadCachedArticles() {
-  try {
-    const raw = localStorage.getItem(ARTICLES_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return [];
-}
+      // ── RSS Parsing ──
+      async function fetchFeed(source) {
+        let lastErr;
+        for (const proxy of CORS_PROXIES) {
+          try {
+            const res = await fetch(proxy(source.url), { signal: AbortSignal.timeout(15000) });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return parseRSS(await res.text(), source);
+          } catch (err) {
+            lastErr = err;
+          }
+        }
+        throw lastErr;
+      }
 
-function cacheArticles(articles) {
-  try { localStorage.setItem(ARTICLES_KEY, JSON.stringify(articles.slice(0, 200))); } catch {}
-}
+      function extractImages(item) {
+        const images = [];
+        const mediaEls = [
+          ...Array.from(item.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")),
+          ...Array.from(item.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")),
+          ...Array.from(item.getElementsByTagName("media:content")),
+          ...Array.from(item.getElementsByTagName("media:thumbnail")),
+        ];
+        for (const el of mediaEls) {
+          const url = el.getAttribute("url"),
+            medium = el.getAttribute("medium");
+          if (url && (!medium || medium === "image"))
+            images.push({ url, width: parseInt(el.getAttribute("width") || "0", 10) });
+        }
+        const enc = item.querySelector("enclosure");
+        if (enc) {
+          const type = enc.getAttribute("type") || "",
+            url = enc.getAttribute("url");
+          if (url && type.startsWith("image/"))
+            images.push({ url, width: parseInt(enc.getAttribute("length") || "0", 10) });
+        }
+        const descEl =
+          item.querySelector("description") ||
+          item.getElementsByTagNameNS("http://purl.org/rss/1.0/modules/content/", "encoded")[0] ||
+          item.getElementsByTagName("content:encoded")[0] ||
+          item.querySelector("content") ||
+          item.querySelector("summary");
+        if (descEl) {
+          const html = descEl.textContent || "";
+          for (const m of html.matchAll(/src=["']([^"']+\.(jpe?g|png|gif|webp)[^"']*)["']/gi))
+            if (m[1] && !m[1].includes("data:")) images.push({ url: m[1], width: 0 });
+          for (const m of html.matchAll(/<img[^>]+src=["']([^"']+)["']/gi))
+            if (m[1] && !m[1].includes("data:") && !images.find((i) => i.url === m[1]))
+              images.push({ url: m[1], width: 0 });
+        }
+        return images;
+      }
 
+      function getBestImage(images) {
+        if (!images.length) return null;
+        const withWidth = images.filter((i) => i.width > 0);
+        return withWidth.length ? withWidth.sort((a, b) => b.width - a.width)[0].url : images[0].url;
+      }
 
-// ── RSS Parsing ──
-async function fetchFeed(source) {
-  let lastErr;
-  for (const proxy of CORS_PROXIES) {
-    try {
-      const res = await fetch(proxy(source.url), { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return parseRSS(await res.text(), source);
-    } catch (err) {
-      lastErr = err;
-    }
-  }
-  throw lastErr;
-}
+      function getTextContent(item, ...tags) {
+        for (const tag of tags) {
+          const el = item.querySelector(tag) || item.getElementsByTagNameNS("*", tag)[0];
+          if (el) return (el.textContent || "").trim();
+        }
+        return "";
+      }
 
-function extractImages(item) {
-  const images = [];
-  const mediaEls = [
-    ...Array.from(item.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'content')),
-    ...Array.from(item.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'thumbnail')),
-    ...Array.from(item.getElementsByTagName('media:content')),
-    ...Array.from(item.getElementsByTagName('media:thumbnail')),
-  ];
-  for (const el of mediaEls) {
-    const url = el.getAttribute('url'), medium = el.getAttribute('medium');
-    if (url && (!medium || medium === 'image'))
-      images.push({ url, width: parseInt(el.getAttribute('width') || '0', 10) });
-  }
-  const enc = item.querySelector('enclosure');
-  if (enc) {
-    const type = enc.getAttribute('type') || '', url = enc.getAttribute('url');
-    if (url && type.startsWith('image/'))
-      images.push({ url, width: parseInt(enc.getAttribute('length') || '0', 10) });
-  }
-  const descEl =
-    item.querySelector('description') ||
-    item.getElementsByTagNameNS('http://purl.org/rss/1.0/modules/content/', 'encoded')[0] ||
-    item.getElementsByTagName('content:encoded')[0] ||
-    item.querySelector('content') ||
-    item.querySelector('summary');
-  if (descEl) {
-    const html = descEl.textContent || '';
-    for (const m of html.matchAll(/src=["']([^"']+\.(jpe?g|png|gif|webp)[^"']*)["']/gi))
-      if (m[1] && !m[1].includes('data:')) images.push({ url: m[1], width: 0 });
-    for (const m of html.matchAll(/<img[^>]+src=["']([^"']+)["']/gi))
-      if (m[1] && !m[1].includes('data:') && !images.find(i => i.url === m[1]))
-        images.push({ url: m[1], width: 0 });
-  }
-  return images;
-}
+      function stripHtml(html) {
+        const d = document.createElement("div");
+        d.innerHTML = html;
+        return (d.textContent || d.innerText || "").trim();
+      }
 
-function getBestImage(images) {
-  if (!images.length) return null;
-  const withWidth = images.filter(i => i.width > 0);
-  return withWidth.length ? withWidth.sort((a,b) => b.width - a.width)[0].url : images[0].url;
-}
+      function parseRSS(xmlText, source) {
+        const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+        if (doc.querySelector("parsererror")) throw new Error("XML parse error");
 
-function getTextContent(item, ...tags) {
-  for (const tag of tags) {
-    const el = item.querySelector(tag) || item.getElementsByTagNameNS('*', tag)[0];
-    if (el) return (el.textContent || '').trim();
-  }
-  return '';
-}
+        const isAtom = !!doc.querySelector("feed");
+        const items = Array.from(doc.querySelectorAll(isAtom ? "entry" : "item"));
 
-function stripHtml(html) {
-  const d = document.createElement('div');
-  d.innerHTML = html;
-  return (d.textContent || d.innerText || '').trim();
-}
+        return items
+          .slice(0, 30)
+          .map((item) => {
+            let title, link, pubDate, description;
+            if (isAtom) {
+              title = getTextContent(item, "title");
+              const lEl = item.querySelector('link[rel="alternate"], link:not([rel="self"])');
+              link = lEl ? lEl.getAttribute("href") || lEl.textContent : getTextContent(item, "id");
+              pubDate = getTextContent(item, "published", "updated");
+              description = getTextContent(item, "summary", "content");
+            } else {
+              title = getTextContent(item, "title");
+              link = getTextContent(item, "link");
+              pubDate = getTextContent(item, "pubDate", "dc:date", "published");
+              description = getTextContent(item, "description", "content:encoded", "content");
+            }
+            const date = pubDate ? new Date(pubDate) : new Date(0);
+            return {
+              id: link || title,
+              sourceId: source.id,
+              sourceName: source.name,
+              title: stripHtml(title),
+              link,
+              date: isNaN(date.getTime()) ? new Date(0) : date,
+              description: stripHtml(description).slice(0, 500),
+              image: getBestImage(extractImages(item)),
+            };
+          })
+          .filter((a) => a.title && a.link);
+      }
 
-function parseRSS(xmlText, source) {
-  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
-  if (doc.querySelector('parsererror')) throw new Error('XML parse error');
+      // ── Data ──
+      async function fetchAll() {
+        if (state.loading) return;
+        state.loading = true;
+        updateRefreshBtn(true);
 
-  const isAtom = !!doc.querySelector('feed');
-  const items = Array.from(doc.querySelectorAll(isAtom ? 'entry' : 'item'));
+        const enabled = state.sources.filter((s) => s.enabled);
+        if (!enabled.length) {
+          state.loading = false;
+          updateRefreshBtn(false);
+          renderGrid();
+          return;
+        }
 
-  return items.slice(0, 30).map(item => {
-    let title, link, pubDate, description;
-    if (isAtom) {
-      title = getTextContent(item, 'title');
-      const lEl = item.querySelector('link[rel="alternate"], link:not([rel="self"])');
-      link = lEl ? (lEl.getAttribute('href') || lEl.textContent) : getTextContent(item, 'id');
-      pubDate = getTextContent(item, 'published', 'updated');
-      description = getTextContent(item, 'summary', 'content');
-    } else {
-      title = getTextContent(item, 'title');
-      link = getTextContent(item, 'link');
-      pubDate = getTextContent(item, 'pubDate', 'dc:date', 'published');
-      description = getTextContent(item, 'description', 'content:encoded', 'content');
-    }
-    const date = pubDate ? new Date(pubDate) : new Date(0);
-    return {
-      id: link || title,
-      sourceId: source.id,
-      sourceName: source.name,
-      title: stripHtml(title),
-      link,
-      date: isNaN(date.getTime()) ? new Date(0) : date,
-      description: stripHtml(description).slice(0, 500),
-      image: getBestImage(extractImages(item)),
-    };
-  }).filter(a => a.title && a.link);
-}
+        if (!state.articles.length) showSkeletons(enabled.length * 4);
 
-// ── Data ──
-async function fetchAll() {
-  if (state.loading) return;
-  state.loading = true;
-  updateRefreshBtn(true);
+        const results = await Promise.allSettled(enabled.map((s) => fetchFeed(s)));
 
-  const enabled = state.sources.filter(s => s.enabled);
-  if (!enabled.length) {
-    state.loading = false;
-    updateRefreshBtn(false);
-    renderGrid();
-    return;
-  }
+        const incoming = [];
+        let errCount = 0;
+        results.forEach((r, i) => {
+          if (r.status === "fulfilled") incoming.push(...r.value);
+          else {
+            errCount++;
+            console.warn(`Feed error [${enabled[i].name}]:`, r.reason);
+          }
+        });
 
-  if (!state.articles.length) showSkeletons(enabled.length * 4);
+        if (errCount > 0 && !incoming.length && !state.articles.length)
+          showToast(`Failed to load ${errCount} feed(s).`, "error");
+        else if (errCount > 0) showToast(`${errCount} feed(s) failed`, "error");
 
-  const results = await Promise.allSettled(enabled.map(s => fetchFeed(s)));
+        // Merge incoming with existing, deduplicate, expire, sort
+        const cutoff = Date.now() - state.articleMaxAgeDays * 86400000;
+        const seen = new Set();
+        const merged = [...incoming, ...state.articles]
+          .filter((a) => {
+            if (seen.has(a.id)) return false;
+            seen.add(a.id);
+            return true;
+          })
+          .filter((a) => new Date(a.date).getTime() > cutoff)
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const incoming = [];
-  let errCount = 0;
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') incoming.push(...r.value);
-    else { errCount++; console.warn(`Feed error [${enabled[i].name}]:`, r.reason); }
-  });
+        state.articles = merged;
+        cacheArticles(merged);
+        state.loading = false;
+        updateRefreshBtn(false);
+        renderGrid();
+        scheduleRefresh();
+        startAutoScroll();
+      }
 
-  if (errCount > 0 && !incoming.length && !state.articles.length) showToast(`Failed to load ${errCount} feed(s).`, 'error');
-  else if (errCount > 0) showToast(`${errCount} feed(s) failed`, 'error');
+      // ── Time ──
+      function timeAgo(date) {
+        if (!date || date.getTime() === 0) return "";
+        const diff = Date.now() - date.getTime();
+        if (diff < 0) return "just now";
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return "just now";
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        return `${Math.floor(hrs / 24)}d ago`;
+      }
 
-  // Merge incoming with existing, deduplicate, expire, sort
-  const cutoff = Date.now() - state.articleMaxAgeDays * 86400000;
-  const seen = new Set();
-  const merged = [...incoming, ...state.articles]
-    .filter(a => { if (seen.has(a.id)) return false; seen.add(a.id); return true; })
-    .filter(a => new Date(a.date).getTime() > cutoff)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+      // ── Rendering ──
+      function interleaveArticles(articles) {
+        const withImg = articles.filter((a) => a.image);
+        const noImg = articles.filter((a) => !a.image);
+        if (!noImg.length) return withImg;
+        if (!withImg.length) return noImg;
+        // After each image card, flush text cards up to the proportional target.
+        // This distributes any number of text cards evenly regardless of ratio.
+        const result = [];
+        let ti = 0;
+        withImg.forEach((a, i) => {
+          result.push(a);
+          const target = Math.round(((i + 1) * noImg.length) / withImg.length);
+          while (ti < target) result.push(noImg[ti++]);
+        });
+        while (ti < noImg.length) result.push(noImg[ti++]);
+        return result;
+      }
 
-  state.articles = merged;
-  cacheArticles(merged);
-  state.loading = false;
-  updateRefreshBtn(false);
-  renderGrid();
-  scheduleRefresh();
-  startAutoScroll();
-}
+      function filteredArticles() {
+        let list = state.articles;
 
-// ── Time ──
-function timeAgo(date) {
-  if (!date || date.getTime() === 0) return '';
-  const diff = Date.now() - date.getTime();
-  if (diff < 0) return 'just now';
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
+        if (state.searchQuery) {
+          const q = state.searchQuery.toLowerCase();
+          list = list.filter(
+            (a) =>
+              a.title.toLowerCase().includes(q) ||
+              a.description.toLowerCase().includes(q) ||
+              a.sourceName.toLowerCase().includes(q),
+          );
+        }
 
-// ── Rendering ──
-function interleaveArticles(articles) {
-  const withImg = articles.filter(a => a.image);
-  const noImg   = articles.filter(a => !a.image);
-  if (!noImg.length)   return withImg;
-  if (!withImg.length) return noImg;
-  // After each image card, flush text cards up to the proportional target.
-  // This distributes any number of text cards evenly regardless of ratio.
-  const result = [];
-  let ti = 0;
-  withImg.forEach((a, i) => {
-    result.push(a);
-    const target = Math.round((i + 1) * noImg.length / withImg.length);
-    while (ti < target) result.push(noImg[ti++]);
-  });
-  while (ti < noImg.length) result.push(noImg[ti++]);
-  return result;
-}
+        return interleaveArticles(list);
+      }
 
-function filteredArticles() {
-  let list = state.articles;
+      function renderGrid() {
+        const grid = document.getElementById("grid");
+        const articles = filteredArticles();
+        if (!articles.length) {
+          grid.innerHTML = `<div id="empty-state"><h2>No articles yet</h2><p>Add or enable sources in Settings, then click Refresh.</p></div>`;
+          return;
+        }
+        grid.innerHTML = articles.map(renderCard).join("");
+      }
 
-  if (state.searchQuery) {
-    const q = state.searchQuery.toLowerCase();
-    list = list.filter(a =>
-      a.title.toLowerCase().includes(q) ||
-      a.description.toLowerCase().includes(q) ||
-      a.sourceName.toLowerCase().includes(q)
-    );
-  }
+      function renderCard(article) {
+        const compact = !article.image;
+        const imgHtml = article.image
+          ? `<img class="card-img" src="${escapeAttr(article.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+          : "";
 
-  return interleaveArticles(list);
-}
-
-function renderGrid() {
-  const grid = document.getElementById('grid');
-  const articles = filteredArticles();
-  if (!articles.length) {
-    grid.innerHTML = `<div id="empty-state"><h2>No articles yet</h2><p>Add or enable sources in Settings, then click Refresh.</p></div>`;
-    return;
-  }
-  grid.innerHTML = articles.map(renderCard).join('');
-}
-
-function renderCard(article) {
-  const compact = !article.image;
-  const imgHtml = article.image
-    ? `<img class="card-img" src="${escapeAttr(article.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-    : '';
-
-  const target = state.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : '';
-  return `<a class="card${compact ? ' card--compact' : ''}" href="${escapeAttr(article.link)}"${target}>
+        const target = state.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : "";
+        return `<a class="card${compact ? " card--compact" : ""}" href="${escapeAttr(article.link)}"${target}>
     ${imgHtml}
     <div class="card-body">
       <div class="card-meta">
@@ -913,14 +1121,16 @@ function renderCard(article) {
         <span>${timeAgo(new Date(article.date))}</span>
       </div>
       <div class="card-title">${escapeHtml(article.title)}</div>
-      ${article.description ? `<div class="card-desc">${escapeHtml(article.description)}</div>` : ''}
+      ${article.description ? `<div class="card-desc">${escapeHtml(article.description)}</div>` : ""}
     </div>
   </a>`;
-}
+      }
 
-function showSkeletons(count) {
-  document.getElementById('grid').innerHTML = Array.from({ length: count }, () =>
-    `<div class="skeleton">
+      function showSkeletons(count) {
+        document.getElementById("grid").innerHTML = Array.from(
+          { length: count },
+          () =>
+            `<div class="skeleton">
       <div class="skel-img shimmer"></div>
       <div class="skel-body">
         <div class="skel-line short"></div>
@@ -928,280 +1138,328 @@ function showSkeletons(count) {
         <div class="skel-line medium shimmer"></div>
         <div class="skel-line long"></div>
       </div>
-    </div>`
-  ).join('');
-}
+    </div>`,
+        ).join("");
+      }
 
-// ── Settings ──
-function openSettings() {
-  document.getElementById('settings-overlay').classList.add('open');
-  document.getElementById('settings-drawer').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  document.getElementById('interval-select').value = String(state.refreshInterval);
-  document.getElementById('retention-select').value = String(state.articleMaxAgeDays);
-  document.getElementById('resume-select').value = String(state.autoScrollResumeDelay);
-  document.getElementById('newtab-toggle').classList.toggle('on', state.openInNewTab);
-  const toggle = document.getElementById('autoscroll-toggle');
-  toggle.classList.toggle('on', state.autoScrollEnabled);
-  document.getElementById('autoscroll-resume-row').style.opacity = state.autoScrollEnabled ? '1' : '0.4';
-  renderSourceList();
-}
+      // ── Settings ──
+      function openSettings() {
+        document.getElementById("settings-overlay").classList.add("open");
+        document.getElementById("settings-drawer").classList.add("open");
+        document.body.style.overflow = "hidden";
+        document.getElementById("interval-select").value = String(state.refreshInterval);
+        document.getElementById("retention-select").value = String(state.articleMaxAgeDays);
+        document.getElementById("resume-select").value = String(state.autoScrollResumeDelay);
+        document.getElementById("newtab-toggle").classList.toggle("on", state.openInNewTab);
+        const toggle = document.getElementById("autoscroll-toggle");
+        toggle.classList.toggle("on", state.autoScrollEnabled);
+        document.getElementById("autoscroll-resume-row").style.opacity = state.autoScrollEnabled ? "1" : "0.4";
+        renderSourceList();
+      }
 
-function toggleNewTab() {
-  state.openInNewTab = !state.openInNewTab;
-  saveSettings();
-  document.getElementById('newtab-toggle').classList.toggle('on', state.openInNewTab);
-  renderGrid();
-}
+      function toggleNewTab() {
+        state.openInNewTab = !state.openInNewTab;
+        saveSettings();
+        document.getElementById("newtab-toggle").classList.toggle("on", state.openInNewTab);
+        renderGrid();
+      }
 
-function toggleAutoScroll() {
-  state.autoScrollEnabled = !state.autoScrollEnabled;
-  saveSettings();
-  const toggle = document.getElementById('autoscroll-toggle');
-  toggle.classList.toggle('on', state.autoScrollEnabled);
-  document.getElementById('autoscroll-resume-row').style.opacity = state.autoScrollEnabled ? '1' : '0.4';
-  if (state.autoScrollEnabled) startAutoScroll();
-  else { if (autoScrollRaf) { cancelAnimationFrame(autoScrollRaf); autoScrollRaf = null; } if (autoScrollResumeTimer) { clearTimeout(autoScrollResumeTimer); autoScrollResumeTimer = null; } }
-}
+      function toggleAutoScroll() {
+        state.autoScrollEnabled = !state.autoScrollEnabled;
+        saveSettings();
+        const toggle = document.getElementById("autoscroll-toggle");
+        toggle.classList.toggle("on", state.autoScrollEnabled);
+        document.getElementById("autoscroll-resume-row").style.opacity = state.autoScrollEnabled ? "1" : "0.4";
+        if (state.autoScrollEnabled) startAutoScroll();
+        else {
+          if (autoScrollRaf) {
+            cancelAnimationFrame(autoScrollRaf);
+            autoScrollRaf = null;
+          }
+          if (autoScrollResumeTimer) {
+            clearTimeout(autoScrollResumeTimer);
+            autoScrollResumeTimer = null;
+          }
+        }
+      }
 
+      function closeSettings() {
+        document.getElementById("settings-overlay").classList.remove("open");
+        document.getElementById("settings-drawer").classList.remove("open");
+        document.body.style.overflow = "";
+      }
 
-function closeSettings() {
-  document.getElementById('settings-overlay').classList.remove('open');
-  document.getElementById('settings-drawer').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function renderSourceList() {
-  const list = document.getElementById('source-list');
-  if (!state.sources.length) {
-    list.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No sources configured.</p>';
-    return;
-  }
-  const defaultIds = new Set(DEFAULT_SOURCES.map(s => s.id));
-  list.innerHTML = state.sources.map((s) => {
-    const deleteBtn = defaultIds.has(s.id) ? '' : `<button class="delete-btn" onclick="deleteSource('${s.id}')" title="Remove">×</button>`;
-    return `<div class="source-item">
+      function renderSourceList() {
+        const list = document.getElementById("source-list");
+        if (!state.sources.length) {
+          list.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No sources configured.</p>';
+          return;
+        }
+        const defaultIds = new Set(DEFAULT_SOURCES.map((s) => s.id));
+        list.innerHTML = state.sources
+          .map((s) => {
+            const deleteBtn = defaultIds.has(s.id)
+              ? ""
+              : `<button class="delete-btn" onclick="deleteSource('${s.id}')" title="Remove">×</button>`;
+            return `<div class="source-item">
       <div class="source-info">
         <div class="source-name">${escapeHtml(s.name)}</div>
         <div class="source-url" title="${escapeAttr(s.url)}">${escapeHtml(s.url)}</div>
       </div>
-      <button class="toggle ${s.enabled ? 'on' : ''}" onclick="toggleSource('${s.id}')"></button>
+      <button class="toggle ${s.enabled ? "on" : ""}" onclick="toggleSource('${s.id}')"></button>
       ${deleteBtn}
     </div>`;
-  }).join('');
-}
+          })
+          .join("");
+      }
 
-function toggleSource(id) {
-  const src = state.sources.find(s => s.id === id);
-  if (!src) return;
-  src.enabled = !src.enabled;
-  saveSettings();
-  renderSourceList();
+      function toggleSource(id) {
+        const src = state.sources.find((s) => s.id === id);
+        if (!src) return;
+        src.enabled = !src.enabled;
+        saveSettings();
+        renderSourceList();
 
-  renderGrid();
-}
-
-function deleteSource(id) {
-  state.sources = state.sources.filter(s => s.id !== id);
-  state.articles = state.articles.filter(a => a.sourceId !== id);
-  saveSettings();
-  renderSourceList();
-
-  renderGrid();
-  showToast('Source removed', 'success');
-}
-
-function addSource() {
-  const nameEl = document.getElementById('new-source-name');
-  const urlEl  = document.getElementById('new-source-url');
-  const name = nameEl.value.trim(), url = urlEl.value.trim();
-  if (!name) { showToast('Please enter a source name', 'error'); return; }
-  if (!url)  { showToast('Please enter a feed URL', 'error'); return; }
-  try { new URL(url); } catch { showToast('Invalid URL', 'error'); return; }
-
-  const id = 'src_' + Date.now();
-  state.sources.push({ id, name, url, enabled: true });
-  saveSettings();
-  renderSourceList();
-
-  nameEl.value = urlEl.value = '';
-  showToast(`Added "${name}" — fetching…`, 'success');
-
-  fetchFeed(state.sources[state.sources.length - 1]).then(articles => {
-    state.articles.push(...articles);
-    const seen = new Set();
-    state.articles = state.articles.filter(a => { if (seen.has(a.id)) return false; seen.add(a.id); return true; });
-    state.articles.sort((a,b) => new Date(b.date) - new Date(a.date));
-    cacheArticles(state.articles);
-    renderGrid();
-  }).catch(err => showToast(`Failed to fetch: ${err.message}`, 'error'));
-}
-
-// ── Theme ──
-function initTheme() {
-  const saved = localStorage.getItem('newsmash_theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const dark = saved ? saved === 'dark' : prefersDark;
-  setTheme(dark, false);
-}
-
-function setTheme(dark, save = true) {
-  document.documentElement.classList.toggle('dark', dark);
-  document.getElementById('theme-icon-sun').style.display  = dark  ? '' : 'none';
-  document.getElementById('theme-icon-moon').style.display = dark  ? 'none' : '';
-  if (save) localStorage.setItem('newsmash_theme', dark ? 'dark' : 'light');
-}
-
-function toggleTheme() {
-  setTheme(!document.documentElement.classList.contains('dark'));
-}
-
-// ── Auto Refresh ──
-function scheduleRefresh() {
-  if (state.refreshTimer) clearTimeout(state.refreshTimer);
-  const ms = state.refreshInterval * 60 * 1000;
-  state.refreshTimer = setTimeout(() => fetchAll(), ms);
-}
-
-// ── Autoscroll ──
-let autoScrollRaf = null;
-let autoScrollResumeTimer = null;
-
-function startAutoScroll() {
-  if (!state.autoScrollEnabled) return;
-  if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
-  if (autoScrollResumeTimer) { clearTimeout(autoScrollResumeTimer); autoScrollResumeTimer = null; }
-
-  setTimeout(() => {
-    if (!state.autoScrollEnabled) return;
-    const speed = 0.6;
-    function step() {
-      if (!state.autoScrollEnabled) return;
-      const maxY = document.documentElement.scrollHeight - window.innerHeight;
-      if (window.scrollY >= maxY) return;
-      window.scrollBy(0, speed);
-      autoScrollRaf = requestAnimationFrame(step);
-    }
-    autoScrollRaf = requestAnimationFrame(step);
-  }, 250);
-}
-
-function pauseAutoScroll() {
-  if (autoScrollRaf) { cancelAnimationFrame(autoScrollRaf); autoScrollRaf = null; }
-  if (autoScrollResumeTimer) clearTimeout(autoScrollResumeTimer);
-  if (state.autoScrollEnabled && state.autoScrollResumeDelay > 0) {
-    autoScrollResumeTimer = setTimeout(startAutoScroll, state.autoScrollResumeDelay * 1000);
-  }
-}
-
-function updateRefreshBtn(loading) {
-  const btn = document.getElementById('refresh-btn');
-  btn.classList.toggle('loading', loading);
-  btn.querySelector('svg').style.animation = loading ? 'spin 1s linear infinite' : '';
-}
-
-// ── Toast ──
-let toastTimer = null;
-function showToast(msg, type = '') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `show ${type}`;
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
-}
-
-// ── Utils ──
-function escapeHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-function escapeAttr(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ── Init ──
-function init() {
-  loadSettings();
-  initTheme();
-
-  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
-  document.getElementById('settings-btn').addEventListener('click', openSettings);
-  document.getElementById('refresh-btn').addEventListener('click', () => fetchAll());
-  document.getElementById('interval-select').addEventListener('change', e => {
-    state.refreshInterval = parseInt(e.target.value, 10);
-    saveSettings();
-    scheduleRefresh();
-    showToast(`Auto-refresh set to ${state.refreshInterval} min`, 'success');
-  });
-  document.getElementById('resume-select').addEventListener('change', e => {
-    state.autoScrollResumeDelay = parseInt(e.target.value, 10);
-    saveSettings();
-  });
-  document.getElementById('retention-select').addEventListener('change', e => {
-    state.articleMaxAgeDays = parseInt(e.target.value, 10);
-    saveSettings();
-    // Re-apply expiry immediately
-    const cutoff = Date.now() - state.articleMaxAgeDays * 86400000;
-    state.articles = state.articles.filter(a => new Date(a.date).getTime() > cutoff);
-    cacheArticles(state.articles);
-    renderGrid();
-    showToast(`Keeping articles for ${state.articleMaxAgeDays} day(s)`, 'success');
-  });
-  // Cancel autoscroll on any user scroll or key interaction
-  window.addEventListener('wheel',     pauseAutoScroll, { passive: true });
-  window.addEventListener('touchmove', pauseAutoScroll, { passive: true });
-  window.addEventListener('keydown',   pauseAutoScroll, { passive: true });
-
-  // Search bar
-  const searchInput = document.getElementById('search-input');
-  const searchBar   = document.getElementById('search-bar');
-  let searchDebounce;
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(() => {
-      state.searchQuery = searchInput.value.trim();
-      searchBar.classList.toggle('has-query', !!state.searchQuery);
-      renderGrid();
-    }, 200);
-  });
-  document.getElementById('search-clear').addEventListener('click', () => {
-    searchInput.value = '';
-    state.searchQuery = '';
-    searchBar.classList.remove('has-query');
-    renderGrid();
-    searchInput.focus();
-  });
-  // Prevent autoscroll pause while typing in search
-  searchInput.addEventListener('keydown', e => e.stopPropagation());
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeSettings();
-      if (state.searchQuery) {
-        searchInput.value = '';
-        state.searchQuery = '';
-        searchBar.classList.remove('has-query');
         renderGrid();
       }
-    }
-    if ((e.key === 'r' || e.key === 'R') &&
-        document.activeElement.tagName !== 'INPUT' &&
-        document.activeElement.tagName !== 'TEXTAREA') fetchAll();
-  });
 
-  const cached = loadCachedArticles();
-  if (cached.length) {
-    state.articles = cached.map(a => ({ ...a, date: new Date(a.date) }));
-  
-    renderGrid();
-  } else {
-  
-    showSkeletons(12);
-  }
+      function deleteSource(id) {
+        state.sources = state.sources.filter((s) => s.id !== id);
+        state.articles = state.articles.filter((a) => a.sourceId !== id);
+        saveSettings();
+        renderSourceList();
 
-  fetchAll();
-}
+        renderGrid();
+        showToast("Source removed", "success");
+      }
 
-document.addEventListener('DOMContentLoaded', init);
-</script>
-</body>
+      function addSource() {
+        const nameEl = document.getElementById("new-source-name");
+        const urlEl = document.getElementById("new-source-url");
+        const name = nameEl.value.trim(),
+          url = urlEl.value.trim();
+        if (!name) {
+          showToast("Please enter a source name", "error");
+          return;
+        }
+        if (!url) {
+          showToast("Please enter a feed URL", "error");
+          return;
+        }
+        try {
+          new URL(url);
+        } catch {
+          showToast("Invalid URL", "error");
+          return;
+        }
+
+        const id = "src_" + Date.now();
+        state.sources.push({ id, name, url, enabled: true });
+        saveSettings();
+        renderSourceList();
+
+        nameEl.value = urlEl.value = "";
+        showToast(`Added "${name}" — fetching…`, "success");
+
+        fetchFeed(state.sources[state.sources.length - 1])
+          .then((articles) => {
+            state.articles.push(...articles);
+            const seen = new Set();
+            state.articles = state.articles.filter((a) => {
+              if (seen.has(a.id)) return false;
+              seen.add(a.id);
+              return true;
+            });
+            state.articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+            cacheArticles(state.articles);
+            renderGrid();
+          })
+          .catch((err) => showToast(`Failed to fetch: ${err.message}`, "error"));
+      }
+
+      // ── Theme ──
+      function initTheme() {
+        const saved = localStorage.getItem("newsmash_theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const dark = saved ? saved === "dark" : prefersDark;
+        setTheme(dark, false);
+      }
+
+      function setTheme(dark, save = true) {
+        document.documentElement.classList.toggle("dark", dark);
+        document.getElementById("theme-icon-sun").style.display = dark ? "" : "none";
+        document.getElementById("theme-icon-moon").style.display = dark ? "none" : "";
+        if (save) localStorage.setItem("newsmash_theme", dark ? "dark" : "light");
+      }
+
+      function toggleTheme() {
+        setTheme(!document.documentElement.classList.contains("dark"));
+      }
+
+      // ── Auto Refresh ──
+      function scheduleRefresh() {
+        if (state.refreshTimer) clearTimeout(state.refreshTimer);
+        const ms = state.refreshInterval * 60 * 1000;
+        state.refreshTimer = setTimeout(() => fetchAll(), ms);
+      }
+
+      // ── Autoscroll ──
+      let autoScrollRaf = null;
+      let autoScrollResumeTimer = null;
+
+      function startAutoScroll() {
+        if (!state.autoScrollEnabled) return;
+        if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
+        if (autoScrollResumeTimer) {
+          clearTimeout(autoScrollResumeTimer);
+          autoScrollResumeTimer = null;
+        }
+
+        setTimeout(() => {
+          if (!state.autoScrollEnabled) return;
+          const speed = 0.6;
+          function step() {
+            if (!state.autoScrollEnabled) return;
+            const maxY = document.documentElement.scrollHeight - window.innerHeight;
+            if (window.scrollY >= maxY) return;
+            window.scrollBy(0, speed);
+            autoScrollRaf = requestAnimationFrame(step);
+          }
+          autoScrollRaf = requestAnimationFrame(step);
+        }, 250);
+      }
+
+      function pauseAutoScroll() {
+        if (autoScrollRaf) {
+          cancelAnimationFrame(autoScrollRaf);
+          autoScrollRaf = null;
+        }
+        if (autoScrollResumeTimer) clearTimeout(autoScrollResumeTimer);
+        if (state.autoScrollEnabled && state.autoScrollResumeDelay > 0) {
+          autoScrollResumeTimer = setTimeout(startAutoScroll, state.autoScrollResumeDelay * 1000);
+        }
+      }
+
+      function updateRefreshBtn(loading) {
+        const btn = document.getElementById("refresh-btn");
+        btn.classList.toggle("loading", loading);
+        btn.querySelector("svg").style.animation = loading ? "spin 1s linear infinite" : "";
+      }
+
+      // ── Toast ──
+      let toastTimer = null;
+      function showToast(msg, type = "") {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className = `show ${type}`;
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
+      }
+
+      // ── Utils ──
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+      function escapeAttr(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      // ── Init ──
+      function init() {
+        loadSettings();
+        initTheme();
+
+        document.getElementById("theme-btn").addEventListener("click", toggleTheme);
+        document.getElementById("settings-btn").addEventListener("click", openSettings);
+        document.getElementById("refresh-btn").addEventListener("click", () => fetchAll());
+        document.getElementById("interval-select").addEventListener("change", (e) => {
+          state.refreshInterval = parseInt(e.target.value, 10);
+          saveSettings();
+          scheduleRefresh();
+          showToast(`Auto-refresh set to ${state.refreshInterval} min`, "success");
+        });
+        document.getElementById("resume-select").addEventListener("change", (e) => {
+          state.autoScrollResumeDelay = parseInt(e.target.value, 10);
+          saveSettings();
+        });
+        document.getElementById("retention-select").addEventListener("change", (e) => {
+          state.articleMaxAgeDays = parseInt(e.target.value, 10);
+          saveSettings();
+          // Re-apply expiry immediately
+          const cutoff = Date.now() - state.articleMaxAgeDays * 86400000;
+          state.articles = state.articles.filter((a) => new Date(a.date).getTime() > cutoff);
+          cacheArticles(state.articles);
+          renderGrid();
+          showToast(`Keeping articles for ${state.articleMaxAgeDays} day(s)`, "success");
+        });
+        // Cancel autoscroll on any user scroll or key interaction
+        window.addEventListener("wheel", pauseAutoScroll, { passive: true });
+        window.addEventListener("touchmove", pauseAutoScroll, { passive: true });
+        window.addEventListener("keydown", pauseAutoScroll, { passive: true });
+
+        // Search bar
+        const searchInput = document.getElementById("search-input");
+        const searchBar = document.getElementById("search-bar");
+        let searchDebounce;
+        searchInput.addEventListener("input", () => {
+          clearTimeout(searchDebounce);
+          searchDebounce = setTimeout(() => {
+            state.searchQuery = searchInput.value.trim();
+            searchBar.classList.toggle("has-query", !!state.searchQuery);
+            renderGrid();
+          }, 200);
+        });
+        document.getElementById("search-clear").addEventListener("click", () => {
+          searchInput.value = "";
+          state.searchQuery = "";
+          searchBar.classList.remove("has-query");
+          renderGrid();
+          searchInput.focus();
+        });
+        // Prevent autoscroll pause while typing in search
+        searchInput.addEventListener("keydown", (e) => e.stopPropagation());
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            closeSettings();
+            if (state.searchQuery) {
+              searchInput.value = "";
+              state.searchQuery = "";
+              searchBar.classList.remove("has-query");
+              renderGrid();
+            }
+          }
+          if (
+            (e.key === "r" || e.key === "R") &&
+            document.activeElement.tagName !== "INPUT" &&
+            document.activeElement.tagName !== "TEXTAREA"
+          )
+            fetchAll();
+        });
+
+        const cached = loadCachedArticles();
+        if (cached.length) {
+          state.articles = cached.map((a) => ({ ...a, date: new Date(a.date) }));
+
+          renderGrid();
+        } else {
+          showSkeletons(12);
+        }
+
+        fetchAll();
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
 </html>

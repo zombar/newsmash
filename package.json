@@ -1,0 +1,23 @@
+{
+  "name": "newsmash",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint": "htmlhint index.html",
+    "format:check": "prettier --check index.html",
+    "format": "prettier --write index.html"
+  },
+  "devDependencies": {
+    "htmlhint": "^1.1.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.3"
+  },
+  "lint-staged": {
+    "index.html": [
+      "prettier --write",
+      "htmlhint"
+    ]
+  }
+}
