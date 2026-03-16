@@ -788,6 +788,23 @@
               <option value="60">1 min</option>
             </select>
           </div>
+          <div class="setting-row" id="autoscroll-speed-row">
+            <label for="speed-range">Scroll speed</label>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <input
+                type="range"
+                id="speed-range"
+                min="0.1"
+                max="0.8"
+                step="0.05"
+                style="width: 120px; cursor: pointer"
+              />
+              <span
+                id="speed-label"
+                style="font-size: 12px; color: var(--text-muted); min-width: 52px; text-align: right"
+              ></span>
+            </div>
+          </div>
         </div>
         <div class="settings-section">
           <h3>Auto Refresh</h3>
@@ -940,6 +957,7 @@
         openInNewTab: false,
         autoScrollEnabled: true,
         autoScrollResumeDelay: 10,
+        autoScrollSpeed: 0.6,
         refreshTimer: null,
         loading: false,
       };
@@ -959,6 +977,7 @@
             state.openInNewTab = data.openInNewTab === true;
             state.autoScrollEnabled = data.autoScrollEnabled !== false;
             state.autoScrollResumeDelay = data.autoScrollResumeDelay ?? 10;
+            state.autoScrollSpeed = data.autoScrollSpeed ?? 0.6;
           } else {
             state.sources = DEFAULT_SOURCES.map((s) => ({ ...s }));
           }
@@ -977,6 +996,7 @@
             openInNewTab: state.openInNewTab,
             autoScrollEnabled: state.autoScrollEnabled,
             autoScrollResumeDelay: state.autoScrollResumeDelay,
+            autoScrollSpeed: state.autoScrollSpeed,
           }),
         );
       }
@@ -1253,10 +1273,13 @@
         document.getElementById("interval-select").value = String(state.refreshInterval);
         document.getElementById("retention-select").value = String(state.articleMaxAgeDays);
         document.getElementById("resume-select").value = String(state.autoScrollResumeDelay);
+        document.getElementById("speed-range").value = String(state.autoScrollSpeed);
+        updateSpeedLabel(state.autoScrollSpeed);
         document.getElementById("newtab-toggle").classList.toggle("on", state.openInNewTab);
         const toggle = document.getElementById("autoscroll-toggle");
         toggle.classList.toggle("on", state.autoScrollEnabled);
         document.getElementById("autoscroll-resume-row").style.opacity = state.autoScrollEnabled ? "1" : "0.4";
+        document.getElementById("autoscroll-speed-row").style.opacity = state.autoScrollEnabled ? "1" : "0.4";
         renderSourceList();
       }
 
@@ -1273,6 +1296,7 @@
         const toggle = document.getElementById("autoscroll-toggle");
         toggle.classList.toggle("on", state.autoScrollEnabled);
         document.getElementById("autoscroll-resume-row").style.opacity = state.autoScrollEnabled ? "1" : "0.4";
+        document.getElementById("autoscroll-speed-row").style.opacity = state.autoScrollEnabled ? "1" : "0.4";
         if (state.autoScrollEnabled) startAutoScroll();
         else {
           if (autoScrollRaf) {
@@ -1425,7 +1449,7 @@
 
         setTimeout(() => {
           if (!state.autoScrollEnabled) return;
-          const speed = 0.6;
+          const speed = state.autoScrollSpeed;
           function step() {
             if (!state.autoScrollEnabled) return;
             const maxY = document.documentElement.scrollHeight - window.innerHeight;
@@ -1446,6 +1470,12 @@
         if (state.autoScrollEnabled && state.autoScrollResumeDelay > 0) {
           autoScrollResumeTimer = setTimeout(startAutoScroll, state.autoScrollResumeDelay * 1000);
         }
+      }
+
+      function updateSpeedLabel(v) {
+        const label =
+          v <= 0.15 ? "Very slow" : v <= 0.3 ? "Slow" : v <= 0.5 ? "Normal" : v <= 0.65 ? "Fast" : "Very fast";
+        document.getElementById("speed-label").textContent = label;
       }
 
       function updateRefreshBtn(loading) {
@@ -1501,6 +1531,11 @@
         });
         document.getElementById("resume-select").addEventListener("change", (e) => {
           state.autoScrollResumeDelay = parseInt(e.target.value, 10);
+          saveSettings();
+        });
+        document.getElementById("speed-range").addEventListener("input", (e) => {
+          state.autoScrollSpeed = parseFloat(e.target.value);
+          updateSpeedLabel(state.autoScrollSpeed);
           saveSettings();
         });
         document.getElementById("retention-select").addEventListener("change", (e) => {
