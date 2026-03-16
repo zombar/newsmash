@@ -567,6 +567,47 @@
         cursor: pointer;
       }
 
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 20px;
+        background: var(--ink);
+        border-radius: 10px;
+        outline: none;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0 3px;
+        box-sizing: content-box;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 20px;
+        background: transparent;
+        border-radius: 10px;
+      }
+      input[type="range"]::-moz-range-track {
+        height: 20px;
+        background: transparent;
+        border-radius: 10px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        background: var(--ink-inv);
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: 3px;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        background: var(--ink-inv);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+      }
+
       #interval-row {
         display: flex;
         align-items: center;
@@ -791,14 +832,7 @@
           <div class="setting-row" id="autoscroll-speed-row">
             <label for="speed-range">Scroll speed</label>
             <div style="display: flex; align-items: center; gap: 8px">
-              <input
-                type="range"
-                id="speed-range"
-                min="0.1"
-                max="0.8"
-                step="0.05"
-                style="width: 120px; cursor: pointer"
-              />
+              <input type="range" id="speed-range" min="0.1" max="0.8" step="0.05" style="width: 120px" />
               <span
                 id="speed-label"
                 style="font-size: 12px; color: var(--text-muted); min-width: 52px; text-align: right"
