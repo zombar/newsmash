@@ -1314,6 +1314,7 @@
         document.getElementById("settings-overlay").classList.remove("open");
         document.getElementById("settings-drawer").classList.remove("open");
         document.body.style.overflow = "";
+        if (state.autoScrollEnabled) startAutoScroll();
       }
 
       function renderSourceList() {
@@ -1441,7 +1442,10 @@
 
       function startAutoScroll() {
         if (!state.autoScrollEnabled) return;
-        if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
+        if (autoScrollRaf) {
+          cancelAnimationFrame(autoScrollRaf);
+          autoScrollRaf = null;
+        }
         if (autoScrollResumeTimer) {
           clearTimeout(autoScrollResumeTimer);
           autoScrollResumeTimer = null;
@@ -1449,18 +1453,25 @@
 
         setTimeout(() => {
           if (!state.autoScrollEnabled) return;
-          function step() {
+          let accumulator = 0;
+          const step = () => {
             if (!state.autoScrollEnabled) return;
             const maxY = document.documentElement.scrollHeight - window.innerHeight;
             if (window.scrollY >= maxY) return;
-            window.scrollBy(0, state.autoScrollSpeed);
+            accumulator += state.autoScrollSpeed;
+            if (accumulator >= 1) {
+              const px = Math.floor(accumulator);
+              window.scrollBy(0, px);
+              accumulator -= px;
+            }
             autoScrollRaf = requestAnimationFrame(step);
-          }
+          };
           autoScrollRaf = requestAnimationFrame(step);
         }, 250);
       }
 
       function pauseAutoScroll() {
+        if (document.getElementById("settings-drawer").classList.contains("open")) return;
         if (autoScrollRaf) {
           cancelAnimationFrame(autoScrollRaf);
           autoScrollRaf = null;
